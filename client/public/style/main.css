@@ -1,0 +1,38 @@
+
+
+#inputContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#topDisplayWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#topDisplayContent {
+    width: 100%;
+    padding: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.letters input {
+    width: 60px;
+    height: 60px;
+    margin: 4px;
+    pointer-events: none;
+    border: 1px solid black;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 25pt;
+    text-transform: uppercase;
+    font-family: monospace;
+    color: black;
+}

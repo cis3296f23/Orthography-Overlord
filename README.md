@@ -3,16 +3,9 @@ OrthographyOverlord is a dynamic spelling game that puts your linguistic skills 
 
 # How to run
 Provide here instructions on how to use your application.   
-- Download the latest binary from the Release section on the right on GitHub.
-- On the command line uncompress using
-```
-unzip Orthography-Overlord-main.zip 
-```
-- On the command line run with
-```
-./main.py
-```
-- You will see the game open on your display.
+- Download the latest build for your operating system from the Release section on the right on GitHub.
+
+- Run and play!
 
 # How to contribute
 Follow this project board to know the latest status of the project: [https://github.com/orgs/cis3296f23/projects/113]([https://github.com/orgs/cis3296f23/projects/113])  
@@ -21,6 +14,7 @@ Follow this project board to know the latest status of the project: [https://git
 - Use this github repository to download the zipfile or clone it to your local repository:  
 - Specify what branch to use for a more stable release or for cutting edge development.  
 - Use Visual Studio Code
-- Install Python3 and pip
-- Download pygame with "pip install pygame"
-- Run main.py with "python <path_to_main>", a window should appear running the game.
+- Install Node and NPM
+- Install development dependencies with `npm i`
+- Run `npm start` to start the app.
+- Run `npm make` to compile the app for release.
