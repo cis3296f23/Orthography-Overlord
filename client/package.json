@@ -1,7 +1,7 @@
 {
   "name": "orthography-overlord-client",
   "version": "1.0.0",
-  "description": "",
+  "description": "Orthography Overlord Client",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "",
+  "author": "Orthography Overlord Team",
   "license": "ISC",
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",

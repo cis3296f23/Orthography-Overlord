@@ -10,11 +10,14 @@ Provide here instructions on how to use your application.
 # How to contribute
 Follow this project board to know the latest status of the project: [https://github.com/orgs/cis3296f23/projects/113]([https://github.com/orgs/cis3296f23/projects/113])  
 
-### How to build
+# Building for Development
+### Guidelines and General Requirements
 - Use this github repository to download the zipfile or clone it to your local repository:  
 - Specify what branch to use for a more stable release or for cutting edge development.  
 - Use Visual Studio Code
 - Install Node and NPM
-- Install development dependencies with `npm i`
-- Run `npm start` to start the app.
-- Run `npm make` to compile the app for release.
+
+### Orthography Overlord Client
+- `cd` into the client directory
+- Execute `npm start` or `npm run start` to start the app.
+- Execute `npm run make` to compile the app for release.
