@@ -110,6 +110,12 @@ window.addEventListener('DOMContentLoaded', () => {
         // do something with data here
         console.log("RECEIVED DATA!!!!");
         console.log(data);
+
+        var url = `https://media.merriam-webster.com/audio/prons/en/us/mp3/v/${data}.mp3`
+
+        sound.src = url;
+
+
     });
 
     ipcRenderer.on('dictionary-error-response', (event, error) => {

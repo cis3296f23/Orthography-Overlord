@@ -10,15 +10,19 @@ const axios = require('axios');
 // declare new event listener
 ipcMain.on("make-dictionary-request", (event, word) => {
 
-  var url = "https://google.com";
+  var url = "https://dictionaryapi.com/api/v3/references/collegiate/json/test?key=fa42b88d-7476-4683-8554-836973c63ab2";
   // var url = `dictionary_url/${word}`
   // wrapping string in backticks lets us insert variables with ${mycoolvar}
 
   // make request
   axios.get(url)
   .then((res) => {
+
+    console.log(res);
+    var audio = res.data[0].hwi.prs[0].sound.audio;
+
       // reply back on this channel with the data
-      event.reply("dictionary-data-response", JSON.stringify(res.data));
+      event.reply("dictionary-data-response", audio);
   })
   .catch((err) => { 
       // reply back on this channel with the error
