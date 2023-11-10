@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron')
 
+
+
 class GameManager {
     constructor(_inputContainer) {
         this.inputBoxes = [];
@@ -96,9 +98,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const sound = document.getElementById('primaryAudio');
     const inputContainer = document.getElementById('inputContainer');
 
+
     function replaySound() {
         sound.play();
     }
+
+
 
     // IPC !!!!
     // MOVE TO SOMEWHERE ELSE!!!!!!
@@ -122,6 +127,10 @@ window.addEventListener('DOMContentLoaded', () => {
     
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
+    document.getElementById('myButton').addEventListener('click', () => {
+        // Send an IPC message to load the menu
+        ipcRenderer.send('load-menu', { /* additional data if needed */ });
+    });
 })
 
 
