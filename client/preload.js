@@ -45,23 +45,20 @@ class GameManager {
         this.hintText.innerHTML = ""
     }
     
-    setupGame = async (wordlist) => {
-        this.wordlist = wordlist;
-        this.loadedAudio = [];
-
-        for(var word of this.wordlist) {
-            var filename = await this.loadAudio(word);
-            this.loadedAudio.push(filename);
-        }
-
     setupGame = async (wordList) => {
         this.wordList = wordList;
         this.loadedAudio = [];
 
         for(var word of this.wordList) {
+            try {
             var filename = await this.loadAudio(word);
+            } catch(e) {
+                console.error("Could not load a file.", e);
+            }
+
             this.loadedAudio.push(filename);
         }
+
         this.solvedWords = [];
         this.gameIndex = 0;
         this.loadWord();
@@ -86,7 +83,7 @@ class GameManager {
         this.clearInput();
     }
 
-    clearInput() {
+    clearInput = () => {
         for(const input of this.inputBoxes) {
             input.value = "";
         }
@@ -103,7 +100,10 @@ class GameManager {
 
 
     loadWord = () => {
-        var word = this.wordlist[this.gameIndex];
+        console.log(this.wordList);
+        console.log(this.gameIndex);
+
+        var word = this.wordList[this.gameIndex];
         this.audioPlayer.src = this.loadedAudio[this.gameIndex];
         this.audioPlayer.play();
         this.resetWord();
@@ -186,44 +186,18 @@ window.addEventListener('DOMContentLoaded', () => {
     const sound = document.getElementById('primaryAudio');
     const alien = document.getElementById('alien');
     const hintText = document.getElementById('hintText')
-
     const inputContainer = document.getElementById('inputContainer');
 
 
     function replaySound() {
         sound.play();
     }
-    
 
     function winCallback() {
         alien.classList.remove("hidden");
     }
     
     const game = new GameManager(inputContainer, sound, winCallback, hintText);
-
-
-    // IPC !!!!
-    // MOVE TO SOMEWHERE ELSE!!!!!!
-
-    ipcRenderer.on('dictionary-data-response', (event, filename) => {
-        sound.src = filename;
-
-    });
-
-    ipcRenderer.on('dictionary-error-response', (event, error) => {
-        // do something with error here
-        console.log("RECEIVED ERROR");
-        console.log(error);
-    });
-
-    // ASK MAIN.JS FOR DATA
-    
-
-    function winCallback() {
-        alien.classList.remove("hidden");
-    }
-    
-    const game = new GameManager(inputContainer, sound, winCallback);
     game.setupGame(["barnacle", "python"]);
     
 
