@@ -3,31 +3,32 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
 const axios = require('axios');
+const fs = require('fs');
 
-
-
+const userpath = app.getPath("userData");
 
 // declare new event listener
-ipcMain.on("make-dictionary-request", (event, word) => {
+ipcMain.on("make-dictionary-request", async (event, word) => {
+ 	const win = BrowserWindow.getFocusedWindow();
+  var url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;
 
-  var url = "https://dictionaryapi.com/api/v3/references/collegiate/json/test?key=fa42b88d-7476-4683-8554-836973c63ab2";
-  // var url = `dictionary_url/${word}`
-  // wrapping string in backticks lets us insert variables with ${mycoolvar}
+  try {
+    const res = await axios.get(url);
+    const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${word[0]}/${res.data[0].hwi.prs[0].sound.audio}.mp3`;
+    const filename = path.join(userpath, `${res.data[0].hwi.prs[0].sound.audio}.mp3`);
+    
+    const audioStream = await axios.get(audioUrl, {
+      responseType: 'stream',
+    });
 
-  // make request
-  axios.get(url)
-  .then((res) => {
+    await audioStream.data.pipe(fs.createWriteStream(filename));
 
-    console.log(res);
-    var audio = res.data[0].hwi.prs[0].sound.audio;
+    event.reply("dictionary-data-response", filename);
 
-      // reply back on this channel with the data
-      event.reply("dictionary-data-response", audio);
-  })
-  .catch((err) => { 
-      // reply back on this channel with the error
-      event.reply("dictionary-error-response", JSON.stringify(err));
-  })
+  } catch(err) {
+    console.log(err);
+    event.reply("dictionary-error-response", JSON.stringify(err));
+  }
 })
 
 const createWindow = () => {
@@ -44,13 +45,14 @@ const createWindow = () => {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+
   createWindow()
 
   app.on('activate', () => {

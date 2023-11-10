@@ -87,12 +87,9 @@ class GameManager {
     }
 }
 
-
-
 function makeTestRequest() {
-    ipcRenderer.send("make-dictionary-request", "python");
+    ipcRenderer.send("make-dictionary-request", "barnacle");
 }
-
 
 window.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('replayButton');
@@ -106,15 +103,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // IPC !!!!
     // MOVE TO SOMEWHERE ELSE!!!!!!
 
-    ipcRenderer.on('dictionary-data-response', (event, data) => {
-        // do something with data here
-        console.log("RECEIVED DATA!!!!");
-        console.log(data);
-
-        var url = `https://media.merriam-webster.com/audio/prons/en/us/mp3/v/${data}.mp3`
-
-        sound.src = url;
-
+    ipcRenderer.on('dictionary-data-response', (event, filename) => {
+        sound.src = filename;
 
     });
 
@@ -128,7 +118,7 @@ window.addEventListener('DOMContentLoaded', () => {
     makeTestRequest();
     
     const game = new GameManager(inputContainer);
-    game.loadWord("python");
+    game.loadWord("barnacle");
     
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
