@@ -16,6 +16,23 @@ class GameManager {
         this.solvedWords = [];   
         this.gameIndex = 0;
     }
+
+    hintConstructor() {
+        user_input = this.getEnteredLetters
+        let hint = "";
+        let input_len = user_input.length;
+        for (let i = 0; i < this.currentWord.length - 1; i++) {
+            if (i < input_len && word[i] === user_input[i]) {
+                hint += word[i];
+                continue;
+            }
+            if (hint.length + 1 < this.currentWord.length) {
+                hint += word[i];
+            }
+            break;
+        }
+        return hint;
+    }
     
     setupGame = async (wordlist) => {
         this.wordlist = wordlist;
