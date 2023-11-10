@@ -1,7 +1,30 @@
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
+const axios = require('axios');
+
+
+
+
+// declare new event listener
+ipcMain.on("make-dictionary-request", (event, word) => {
+
+  var url = "https://google.com";
+  // var url = `dictionary_url/${word}`
+  // wrapping string in backticks lets us insert variables with ${mycoolvar}
+
+  // make request
+  axios.get(url)
+  .then((res) => {
+      // reply back on this channel with the data
+      event.reply("dictionary-data-response", JSON.stringify(res.data));
+  })
+  .catch((err) => { 
+      // reply back on this channel with the error
+      event.reply("dictionary-error-response", JSON.stringify(err));
+  })
+})
 
 const createWindow = () => {
   // Create the browser window.
@@ -17,7 +40,7 @@ const createWindow = () => {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-//   mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
