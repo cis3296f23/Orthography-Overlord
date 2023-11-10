@@ -8,6 +8,24 @@ class GameManager {
         this.currentWord = "";
     }
 
+    hint_constructor() {
+        user_input = this.getEnteredLetters
+        let hint = "";
+        let input_len = user_input.length;
+        for (let i = 0; i < this.currentWord.length - 1; i++) {
+            if (i < input_len && word[i] === user_input[i]) {
+                hint += word[i];
+                continue;
+            }
+            if (hint.length + 1 < this.currentWord.length) {
+                hint += word[i];
+            }
+            break;
+        }
+        return hint;
+    }
+      
+
     resetWord() {
         this.inputContainer.innerHTML = "";
         this.inputBoxes = [];
@@ -123,7 +141,3 @@ window.addEventListener('DOMContentLoaded', () => {
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
 })
-
-
-
-  
