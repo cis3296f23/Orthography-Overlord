@@ -87,12 +87,9 @@ class GameManager {
     }
 }
 
-
-
-function makeTestRequest() {
-    ipcRenderer.send("make-dictionary-request", "python");
+function getAudio(word) {
+    ipcRenderer.send("make-dictionary-request", word);
 }
-
 
 window.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('replayButton');
@@ -106,10 +103,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // IPC !!!!
     // MOVE TO SOMEWHERE ELSE!!!!!!
 
-    ipcRenderer.on('dictionary-data-response', (event, data) => {
-        // do something with data here
-        console.log("RECEIVED DATA!!!!");
-        console.log(data);
+    ipcRenderer.on('dictionary-data-response', (event, filename) => {
+        sound.src = filename;
+
     });
 
     ipcRenderer.on('dictionary-error-response', (event, error) => {
@@ -119,10 +115,10 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // ASK MAIN.JS FOR DATA
-    makeTestRequest();
     
     const game = new GameManager(inputContainer);
-    game.loadWord("python");
+    getAudio("barnacle");
+    game.loadWord("barnacle");
     
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
