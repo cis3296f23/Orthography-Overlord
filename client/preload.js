@@ -1,15 +1,16 @@
 const { ipcRenderer } = require('electron')
 
 class GameManager {
-    constructor(_inputContainer, _audioPlayer, _winCallback) {
+    constructor(_inputContainer, _audioPlayer, _winCallback, _hintText) {
         this.inputBoxes = [];
         this.currentInputIndex = 0;
         this.inputContainer = _inputContainer;
         this.audioPlayer = _audioPlayer;
         this.currentWord = "";
+        this.hintText = _hintText
 
         this.loadedAudio = [];
-        this.wordlist = [];
+        this.wordList = [];
 
         this.winCallback = _winCallback;
 
@@ -18,27 +19,36 @@ class GameManager {
     }
 
     hintConstructor() {
-        user_input = this.getEnteredLetters
+        const userInput = this.getEnteredLetters();
+        const input_len = userInput.length;
         let hint = "";
-        let input_len = user_input.length;
         for (let i = 0; i < this.currentWord.length - 1; i++) {
-            if (i < input_len && word[i] === user_input[i]) {
-                hint += word[i];
+            if (i < input_len && this.currentWord[i] === userInput[i]) {
+                hint += this.currentWord[i].toUpperCase();
                 continue;
             }
             if (hint.length + 1 < this.currentWord.length) {
-                hint += word[i];
+                hint += this.currentWord[i].toUpperCase();
             }
             break;
         }
         return hint;
     }
     
-    setupGame = async (wordlist) => {
-        this.wordlist = wordlist;
+    displayHint() {
+        let hint = this.hintConstructor()
+        this.hintText.innerHTML = "Hint: " + hint
+    }
+
+    clearHint() {
+        this.hintText.innerHTML = ""
+    }
+
+    setupGame = async (wordList) => {
+        this.wordList = wordList;
         this.loadedAudio = [];
 
-        for(var word of this.wordlist) {
+        for(var word of this.wordList) {
             var filename = await this.loadAudio(word);
             this.loadedAudio.push(filename);
         }
@@ -49,7 +59,7 @@ class GameManager {
     }
 
     nextWord = () => {
-        if(this.gameIndex < this.wordlist.length-1) {
+        if(this.gameIndex < this.wordList.length-1) {
             this.gameIndex++;
             this.loadWord();
         } else {
@@ -84,7 +94,7 @@ class GameManager {
 
 
     loadWord = () => {
-        var word = this.wordlist[this.gameIndex];
+        var word = this.wordList[this.gameIndex];
         this.audioPlayer.src = this.loadedAudio[this.gameIndex];
         this.audioPlayer.play();
         this.resetWord();
@@ -101,7 +111,6 @@ class GameManager {
     }
 
     onTypeLetter = (e) => {
-        console.log(e);
         let key = e.key.toLowerCase();
 
         if(key == "enter") {
@@ -130,10 +139,12 @@ class GameManager {
         
         if(this.currentInputIndex == this.inputBoxes.length && this.getEnteredLetters() == this.currentWord) {
             console.log("next word");
+            this.clearHint();
             this.nextWord();
             return true;
         } else if (this.currentInputIndex == this.inputBoxes.length) {
             // clear input maybe?
+            this.displayHint();
             this.clearInput();
         }
 
@@ -165,6 +176,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('replayButton');
     const sound = document.getElementById('primaryAudio');
     const alien = document.getElementById('alien');
+    const hintText = document.getElementById('hintText')
 
     const inputContainer = document.getElementById('inputContainer');
 
@@ -177,14 +189,10 @@ window.addEventListener('DOMContentLoaded', () => {
         alien.classList.remove("hidden");
     }
     
-    const game = new GameManager(inputContainer, sound, winCallback);
+    const game = new GameManager(inputContainer, sound, winCallback, hintText);
     game.setupGame(["barnacle", "python"]);
     
 
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
 })
-
-
-
-  
