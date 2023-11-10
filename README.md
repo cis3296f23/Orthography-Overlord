@@ -19,5 +19,6 @@ Follow this project board to know the latest status of the project: [https://git
 
 ### Orthography Overlord Client
 - `cd` into the client directory
+- Run `npm i` to install required packages.
 - Execute `npm start` or `npm run start` to start the app.
 - Execute `npm run make` to compile the app for release.

@@ -1,5 +1,6 @@
-class GameManager {
+const { ipcRenderer } = require('electron')
 
+class GameManager {
     constructor(_inputContainer) {
         this.inputBoxes = [];
         this.currentInputIndex = 0;
@@ -87,6 +88,12 @@ class GameManager {
 }
 
 
+
+function makeTestRequest() {
+    ipcRenderer.send("make-dictionary-request", "python");
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('replayButton');
     const sound = document.getElementById('primaryAudio');
@@ -96,16 +103,30 @@ window.addEventListener('DOMContentLoaded', () => {
         sound.play();
     }
 
-    replayButton.addEventListener('click', replaySound);
+    // IPC !!!!
+    // MOVE TO SOMEWHERE ELSE!!!!!!
 
+    ipcRenderer.on('dictionary-data-response', (event, data) => {
+        // do something with data here
+        console.log("RECEIVED DATA!!!!");
+        console.log(data);
+    });
+
+    ipcRenderer.on('dictionary-error-response', (event, error) => {
+        // do something with error here
+        console.log("RECEIVED ERROR");
+        console.log(error);
+    });
+
+    // ASK MAIN.JS FOR DATA
+    makeTestRequest();
+    
     const game = new GameManager(inputContainer);
     game.loadWord("python");
     
-    // document.addEventListener("keydown", () => {console.log("JJJJ")});
-
     document.addEventListener("keydown", game.onTypeLetter);
-    // inputContainer.addEventListener("input", game.onTypeLetter);
-  })
+    button.addEventListener('click', replaySound);
+})
 
 
 
