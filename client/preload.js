@@ -87,8 +87,8 @@ class GameManager {
     }
 }
 
-function makeTestRequest() {
-    ipcRenderer.send("make-dictionary-request", "barnacle");
+function getAudio(word) {
+    ipcRenderer.send("make-dictionary-request", word);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -115,9 +115,9 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // ASK MAIN.JS FOR DATA
-    makeTestRequest();
     
     const game = new GameManager(inputContainer);
+    getAudio("barnacle");
     game.loadWord("barnacle");
     
     document.addEventListener("keydown", game.onTypeLetter);
