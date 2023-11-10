@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron')
 
+
+
 class GameManager {
     constructor(_inputContainer, _audioPlayer, _winCallback) {
         this.inputBoxes = [];
@@ -151,9 +153,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const inputContainer = document.getElementById('inputContainer');
 
+
     function replaySound() {
         sound.play();
     }
+
+
+
+    // IPC !!!!
+    // MOVE TO SOMEWHERE ELSE!!!!!!
+
+    ipcRenderer.on('dictionary-data-response', (event, filename) => {
+        sound.src = filename;
+
+    });
+
+    ipcRenderer.on('dictionary-error-response', (event, error) => {
+        // do something with error here
+        console.log("RECEIVED ERROR");
+        console.log(error);
+    });
+
+    // ASK MAIN.JS FOR DATA
     
 
     function winCallback() {
@@ -166,6 +187,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
+    document.getElementById('myButton').addEventListener('click', () => {
+        // Send an IPC message to load the menu
+        ipcRenderer.send('load-menu', { /* additional data if needed */ });
+    });
 })
 
 
