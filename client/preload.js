@@ -69,7 +69,6 @@ class GameManager {
             this.gameIndex++;
             this.loadWord();
         } else {
-            console.log("YOU WIN!!!!!!!!!!!!!!!!!!")
             this.winCallback();
             this.setupGame(["flatulence", "armor"]);
         }
@@ -100,8 +99,6 @@ class GameManager {
 
 
     loadWord = () => {
-        console.log(this.wordList);
-        console.log(this.gameIndex);
 
         var word = this.wordList[this.gameIndex];
         this.audioPlayer.src = this.loadedAudio[this.gameIndex];
@@ -147,7 +144,6 @@ class GameManager {
     checkForWin = () => {
         
         if(this.currentInputIndex == this.inputBoxes.length && this.getEnteredLetters() == this.currentWord) {
-            console.log("next word");
             this.clearHint();
             this.nextWord();
             return true;
@@ -166,7 +162,6 @@ class GameManager {
 
             ipcRenderer.on('dictionary-data-response', (event, filename) => {
                 // sound.src = filename;
-                console.log(filename);
                 resolve(filename);
             });
         
