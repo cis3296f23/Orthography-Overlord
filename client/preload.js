@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron')
 
+
+
 class GameManager {
     constructor(_inputContainer, _audioPlayer, _winCallback, _hintText) {
         this.inputBoxes = [];
@@ -11,7 +13,6 @@ class GameManager {
 
         this.loadedAudio = [];
         this.wordList = [];
-
         this.winCallback = _winCallback;
 
         this.solvedWords = [];   
@@ -43,6 +44,15 @@ class GameManager {
     clearHint() {
         this.hintText.innerHTML = ""
     }
+    
+    setupGame = async (wordlist) => {
+        this.wordlist = wordlist;
+        this.loadedAudio = [];
+
+        for(var word of this.wordlist) {
+            var filename = await this.loadAudio(word);
+            this.loadedAudio.push(filename);
+        }
 
     setupGame = async (wordList) => {
         this.wordList = wordList;
@@ -52,7 +62,6 @@ class GameManager {
             var filename = await this.loadAudio(word);
             this.loadedAudio.push(filename);
         }
-
         this.solvedWords = [];
         this.gameIndex = 0;
         this.loadWord();
@@ -94,7 +103,7 @@ class GameManager {
 
 
     loadWord = () => {
-        var word = this.wordList[this.gameIndex];
+        var word = this.wordlist[this.gameIndex];
         this.audioPlayer.src = this.loadedAudio[this.gameIndex];
         this.audioPlayer.play();
         this.resetWord();
@@ -180,6 +189,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const inputContainer = document.getElementById('inputContainer');
 
+
     function replaySound() {
         sound.play();
     }
@@ -190,9 +200,37 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     const game = new GameManager(inputContainer, sound, winCallback, hintText);
+
+
+    // IPC !!!!
+    // MOVE TO SOMEWHERE ELSE!!!!!!
+
+    ipcRenderer.on('dictionary-data-response', (event, filename) => {
+        sound.src = filename;
+
+    });
+
+    ipcRenderer.on('dictionary-error-response', (event, error) => {
+        // do something with error here
+        console.log("RECEIVED ERROR");
+        console.log(error);
+    });
+
+    // ASK MAIN.JS FOR DATA
+    
+
+    function winCallback() {
+        alien.classList.remove("hidden");
+    }
+    
+    const game = new GameManager(inputContainer, sound, winCallback);
     game.setupGame(["barnacle", "python"]);
     
 
     document.addEventListener("keydown", game.onTypeLetter);
     button.addEventListener('click', replaySound);
+    document.getElementById('myButton').addEventListener('click', () => {
+        // Send an IPC message to load the menu
+        ipcRenderer.send('load-menu', { /* additional data if needed */ });
+    });
 })
