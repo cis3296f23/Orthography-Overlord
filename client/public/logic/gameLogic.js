@@ -1,174 +1,180 @@
-class GameManager {
-    constructor(_inputContainer, _audioPlayer, _winCallback, _hintText) {
-        this.inputBoxes = [];
-        this.currentInputIndex = 0;
+class InputManager {
+    constructor(_inputContainer) {
         this.inputContainer = _inputContainer;
-        this.audioPlayer = _audioPlayer;
-        this.currentWord = "";
-        this.hintText = _hintText
-
-        this.loadedAudio = [];
-        this.wordList = [];
-        this.winCallback = _winCallback;
-
-        this.solvedWords = [];   
-        this.gameIndex = 0;
+        this.currentInputBoxes = [];
     }
 
-    hintConstructor() {
-        const userInput = this.getEnteredLetters();
+    createInputBox() {
+        const input = document.createElement('input');
+        input.type = "text";
+        input.disabled = true;
+        input.classList.add('letter');
+        this.inputContainer.appendChild(input);
+        this.currentInputBoxes.push(input);
+        return input;
+    }
+
+    getEnteredLetters() {
+        var entered = "";
+        for(const input of this.currentInputBoxes) {
+            entered += input.value;
+        }
+        return entered;
+    }
+
+    onValidLetterEntered(key) {
+        var input = this.createInputBox();
+        input.value = key;
+    }
+
+    onBackspace() {
+        if(this.currentInputBoxes.length > 0) {
+            this.inputContainer.removeChild(this.currentInputBoxes.pop());
+        } else {
+            // INDICATE THAT USER COULD NOT DELTE WITH A SCREENSHAKE OR SOUND
+        }
+    }
+
+    clearInput() {
+        this.currentInputBoxes = [];
+        this.inputContainer.innerHTML = "";
+    }
+}
+
+
+class AudioManager {
+    constructor(_audioPlayer) {
+        this.audioPlayer = _audioPlayer;
+        this.loadedAudio = {};
+    }
+
+    loadAudio = async (word) => { return window.electronAPI.loadAudioForWord(word) }
+
+    async loadAudioForCurrentGame(wordlist) {
+        for(var word of wordlist) {
+            try {
+                var filename = await this.loadAudio(word);
+            } catch(e) {
+                console.error("Could not load a file.", e);
+            }
+            this.loadedAudio[word] = filename;
+        }
+    }
+
+    setAudioForWord(word) {
+        this.audioPlayer.src = this.loadedAudio[word];
+        this.audioPlayer.play();
+    }
+}
+
+class HintManager {
+    constructor(_hintDisplay) {
+        this.hintDisplay = _hintDisplay;
+    }
+
+    hintConstructor(currentWord, userInput) {
         const input_len = userInput.length;
         let hint = "";
-        for (let i = 0; i < this.currentWord.length - 1; i++) {
-            if (i < input_len && this.currentWord[i] === userInput[i]) {
-                hint += this.currentWord[i].toUpperCase();
+        for (let i = 0; i < currentWord.length - 1; i++) {
+            if (i < input_len && currentWord[i] === userInput[i]) {
+                hint += currentWord[i].toUpperCase();
                 continue;
             }
-            if (hint.length + 1 < this.currentWord.length) {
-                hint += this.currentWord[i].toUpperCase();
+            if (hint.length + 1 < currentWord.length) {
+                hint += currentWord[i].toUpperCase();
             }
             break;
         }
         return hint;
     }
     
-    displayHint() {
-        let hint = this.hintConstructor()
-        this.hintText.innerHTML = "Hint: " + hint
+    displayHint(currentWord, userInput) {
+        let hint = this.hintConstructor(currentWord, userInput)
+        this.hintDisplay.innerHTML = "Hint: " + hint
     }
 
     clearHint() {
-        this.hintText.innerHTML = ""
+        this.hintDisplay.innerHTML = ""
     }
     
-    setupGame = async (wordList) => {
-        this.wordList = wordList;
-        this.loadedAudio = [];
+}
 
-        for(var word of this.wordList) {
-            try {
-            var filename = await this.loadAudio(word);
-            } catch(e) {
-                console.error("Could not load a file.", e);
-            }
+class GameManager {
+    constructor(_inputContainer, _audioPlayer, _hintText) {
+        this.inputManager = new InputManager(_inputContainer);
+        console.log(this.inputManager);
+        this.audioManager = new AudioManager(_audioPlayer);
+        this.hintManager = new HintManager(_hintText);
 
-            this.loadedAudio.push(filename);
-        }
+        this.wordAddedToBack = false;
 
-        this.solvedWords = [];
-        this.gameIndex = 0;
+        this.wordlist = [];
+        this.currentWordIndex = 0;
+    }
+    
+    async setupGame(wordlist) {
+        this.wordlist = wordlist;
+        await this.audioManager.loadAudioForCurrentGame(wordlist);
+
+        this.currentWordIndex = 0;
         this.loadWord();
     }
 
-    nextWord = () => {
-        if(this.gameIndex < this.wordList.length-1) {
-            this.gameIndex++;
+    nextWord() {
+        if(this.currentWordIndex < this.wordlist.length-1) {
+            this.currentWordIndex++;
             this.loadWord();
         } else {
-            this.winCallback();
-            this.setupGame(["flatulence", "armor"]);
+            window.electronAPI.switchPage("MENU");
         }
     }
     
-    resetWord = () => {
-        this.inputContainer.innerHTML = "";
-        this.inputBoxes = [];
-        this.currentInputIndex = 0;
-        this.currentWord = "";
-        this.clearInput();
-    }
-
-    clearInput = () => {
-        for(const input of this.inputBoxes) {
-            input.value = "";
-        }
-        this.currentInputIndex = 0;
-    }
-
-    getEnteredLetters = () => {
-        var entered = "";
-        for(const input of this.inputBoxes) {
-            entered += input.value;
-        }
-        return entered;
-    }
-
-
-    loadWord = () => {
-
-        var word = this.wordList[this.gameIndex];
-        this.audioPlayer.src = this.loadedAudio[this.gameIndex];
-        this.audioPlayer.play();
-        this.resetWord();
-        this.currentWord = word;
-
-        for(const _ in word) {
-            var input = document.createElement('input');
-            input.type = "text";
-            input.disabled = true;
-            input.classList.add('letter');
-            this.inputContainer.appendChild(input);
-            this.inputBoxes.push(input);
-        }
+    loadWord() {
+        this.audioManager.setAudioForWord(this.wordlist[this.currentWordIndex]);
+        this.inputManager.clearInput();
+        this.wordAddedToBack = false;
     }
 
     onTypeLetter = (e) => {
         let key = e.key.toLowerCase();
-
+        
         if(key == "enter") {
             this.checkForWin();
-            return;
-        }
-
-        if(key == "backspace" && this.currentInputIndex > 0) {
-            this.currentInputIndex--;
-            this.inputBoxes[this.currentInputIndex].value = "";
-            return;
-        }
-
-        if(this.currentInputIndex == this.inputBoxes.length) {
-            // shake or something
-            return;
-        }
-
-        if(key.length == 1) {
-            this.inputBoxes[this.currentInputIndex].value = key;
-            this.currentInputIndex++;
+        } else if(key == "backspace") {
+            this.inputManager.onBackspace();
+        } else if(key.length == 1 && "abcdefghijklmnopqrstuvwxyz".includes(key)) {
+            this.inputManager.onValidLetterEntered(key);
         }
     }
 
-    checkForWin = () => {
-        
-        if(this.currentInputIndex == this.inputBoxes.length && this.getEnteredLetters() == this.currentWord) {
-            this.clearHint();
+    checkForWin() {
+        if(this.inputManager.getEnteredLetters() == this.wordlist[this.currentWordIndex]) {
+            this.hintManager.clearHint();
             this.nextWord();
             return true;
-        } else if (this.currentInputIndex == this.inputBoxes.length) {
-            // clear input maybe?
-            this.displayHint();
-            this.clearInput();
         }
 
-         return false;
+        if(!this.wordAddedToBack) {
+            this.wordlist.push(this.wordlist[this.currentWordIndex])
+            this.wordAddedToBack = true;
+        }
+
+        this.hintManager.displayHint(this.wordlist[this.currentWordIndex], this.inputManager.getEnteredLetters());
+        this.inputManager.clearInput();
+        return false;
     }
 
-    loadAudio = async (word) => { return window.electronAPI.loadAudioForWord(word) }
 }
 
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Get references to elements on the page
     const replayButton = document.getElementById('replayButton');
     const sound = document.getElementById('primaryAudio');
-    const alien = document.getElementById('alien');
     const hintText = document.getElementById('hintText')
     const inputContainer = document.getElementById('inputContainer');
     
-    // Set up the game manager
-    function winCallback() { alien.classList.remove("hidden"); }
-    const game = new GameManager(inputContainer, sound, winCallback, hintText);
+    const game = new GameManager(inputContainer, sound, hintText);
 
-    // Set up events
     document.addEventListener("keydown", game.onTypeLetter);
 
     replayButton.addEventListener('click', () => {
@@ -176,11 +182,8 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('myButton').addEventListener('click', () => {
-        // Send an IPC message to load the menu
         window.electronAPI.switchPage("MENU");
     });
-
-    // Start the game
 
     game.setupGame(["barnacle", "python", "kingdom"]);
 });
