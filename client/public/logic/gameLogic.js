@@ -50,8 +50,8 @@ class AudioManager {
 
     loadAudio = async (word) => { return window.electronAPI.loadAudioForWord(word) }
 
-    async loadAudioForCurrentGame(wordlist) {
-        for(var word of wordlist) {
+    async loadAudioForCurrentGame(wordList) {
+        for(var word of wordList) {
             try {
                 var filename = await this.loadAudio(word);
             } catch(e) {
@@ -100,37 +100,42 @@ class HintManager {
 }
 
 class GameManager {
-    constructor(_inputContainer, _audioPlayer, _hintText) {
+    constructor(_inputContainer, _audioPlayer, _hintText, _answerSound) {
         this.inputManager = new InputManager(_inputContainer);
         console.log(this.inputManager);
         this.audioManager = new AudioManager(_audioPlayer);
-        this.hintManager = new HintManager(_hintText);
+        this.hintManager = new HintManager(_hintText); 
+        this.answerSound = _answerSound;
 
         this.wordAddedToBack = false;
 
-        this.wordlist = [];
+        this.wordList = [];
         this.currentWordIndex = 0;
     }
     
-    async setupGame(wordlist) {
-        this.wordlist = wordlist;
-        await this.audioManager.loadAudioForCurrentGame(wordlist);
+    async setupGame(wordList) {
+        this.wordList = wordList;
+        await this.audioManager.loadAudioForCurrentGame(wordList);
 
         this.currentWordIndex = 0;
         this.loadWord();
     }
 
     nextWord() {
-        if(this.currentWordIndex < this.wordlist.length-1) {
+        this.answerSound.src = "./public/sounds/correct_answer.mp3";
+        this.answerSound.play();
+        if(this.currentWordIndex < this.wordList.length-1) {
             this.currentWordIndex++;
-            this.loadWord();
+            setTimeout(() => {
+                this.loadWord();
+            }, 1000);
         } else {
             window.electronAPI.switchPage("MENU");
         }
     }
     
     loadWord() {
-        this.audioManager.setAudioForWord(this.wordlist[this.currentWordIndex]);
+        this.audioManager.setAudioForWord(this.wordList[this.currentWordIndex]);
         this.inputManager.clearInput();
         this.wordAddedToBack = false;
     }
@@ -148,18 +153,21 @@ class GameManager {
     }
 
     checkForWin() {
-        if(this.inputManager.getEnteredLetters() == this.wordlist[this.currentWordIndex]) {
+        if(this.inputManager.getEnteredLetters() == this.wordList[this.currentWordIndex]) {
             this.hintManager.clearHint();
             this.nextWord();
             return true;
         }
 
         if(!this.wordAddedToBack) {
-            this.wordlist.push(this.wordlist[this.currentWordIndex])
+            this.wordList.push(this.wordList[this.currentWordIndex])
             this.wordAddedToBack = true;
         }
 
-        this.hintManager.displayHint(this.wordlist[this.currentWordIndex], this.inputManager.getEnteredLetters());
+        this.answerSound.src = "./public/sounds/wrong_answer.mp3";
+        this.answerSound.play();
+
+        this.hintManager.displayHint(this.wordList[this.currentWordIndex], this.inputManager.getEnteredLetters());
         this.inputManager.clearInput();
         return false;
     }
@@ -172,8 +180,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const sound = document.getElementById('primaryAudio');
     const hintText = document.getElementById('hintText')
     const inputContainer = document.getElementById('inputContainer');
+    const answerSound = document.getElementById('answerSound');
     
-    const game = new GameManager(inputContainer, sound, hintText);
+    const game = new GameManager(inputContainer, sound, hintText, answerSound);
 
     document.addEventListener("keydown", game.onTypeLetter);
 
@@ -185,5 +194,5 @@ window.addEventListener('DOMContentLoaded', () => {
         window.electronAPI.switchPage("MENU");
     });
 
-    game.setupGame(["barnacle", "python", "kingdom"]);
+    game.setupGame(["barnacle", "vinegar", "phylum", "melee", "meiosis", "pharaoh"]);
 });
