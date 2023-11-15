@@ -128,7 +128,7 @@ class GameManager {
             this.currentWordIndex++;
             setTimeout(() => {
                 this.loadWord();
-            }, 1000);
+            }, 800);
         } else {
             window.electronAPI.switchPage("MENU");
         }
@@ -171,7 +171,6 @@ class GameManager {
         this.inputManager.clearInput();
         return false;
     }
-
 }
 
 
