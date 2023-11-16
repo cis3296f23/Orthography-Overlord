@@ -187,6 +187,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     replayButton.addEventListener('click', () => {
         sound.play();
+        // Remove focus from the button to prevent automatic triggering on Enter
+        replayButton.blur();
     });
 
     document.getElementById('myButton').addEventListener('click', () => {
