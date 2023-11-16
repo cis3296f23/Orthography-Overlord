@@ -2,31 +2,44 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Hello Page</title>
+        <title>Orthography Overlord</title>
         <style>
             body {
                 display: flex;
                 flex-direction: column; /* Set flex-direction to column */
-                justify-content: center;
+                /*justify-content: center;*/
                 align-items: center;
                 height: 100vh;
                 margin: 0;
+                /*background-color: rgba(143, 2, 2, 0.97); !* Set the background color *!*/
+                background: url("public/images/reaper.png") center center fixed;
+                background-size: cover; /* Cover the entire background */
             }
 
             h1 {
-                font-size: 3em; /* Adjust the font size as needed */
+                margin-top: 2vw;
+                margin-bottom: 37vw;
+                font-size: 3.2em; /* Adjust the font size as needed */
+                color: darkred;
             }
 
             button {
-                font-size: 1.5em; /* Adjust the font size as needed */
+                font-size: 1.2em; /* Adjust the font size as needed */
+                color: darkred;
                 padding: 10px 20px; /* Adjust the padding to increase button size */
-                margin-bottom: 100px;
+                margin-bottom: 10px;
+                background-color: rgba(54, 44, 44, 0); /* Adjust the transparency as needed */
+                border: none;
+                font-weight: bold;
+                cursor: pointer;
             }
+
         </style>
+
         <script src="./public/logic/mainMenuLogic.js"></script>
     </head>
     <body>
-        <h1>Orthography Overlord</h1>
-        <button id="backButton">Start Game</button>
+        <h1 style="font-family:'Monotype Corsiva',fantasy">Orthography Overlord</h1>
+        <button style="font-family:'fantasy',monospace" id="backButton">Start Game</button>
     </body>
 </html>

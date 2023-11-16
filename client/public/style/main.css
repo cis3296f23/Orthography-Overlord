@@ -1,4 +1,8 @@
-
+body {
+    background-color: rgb(27, 61, 68);
+    color: #fff;
+    margin: 0;
+}
 
 #inputContainer {
     width: 100%;
@@ -15,12 +19,57 @@
 }
 
 #topDisplayContent {
+    position: relative;
     width: 100%;
     padding: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
+
+#hintText {
+    position: absolute;
+    bottom: 50px;
+    width: 70%;
+    font-size: 20pt;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+}
+/* Buttons */
+#replayButton {
+    background-color: #057108;
+    bottom: 20%;
+    left: 40%;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px; 
+    cursor: pointer; 
+    border: none; 
+    border-radius: 5px;
+    outline: none;
+}
+  
+#replayButton:hover {
+    background-color: #003002;
+}
+/* Button for returning to main menu */
+#myButton {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 10px 20px;
+    background-color: #870000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#myButton:hover {
+    background-color: #400000;
+}
+
 
 
 .letters input {
@@ -33,8 +82,9 @@
     border-radius: 15px;
     font-size: 25pt;
     text-transform: uppercase;
-    font-family: monospace;
+    font-family: Arial, sans-serif;
     color: black;
+    background-color: rgb(76, 159, 177);
 }
 
 .hidden {
