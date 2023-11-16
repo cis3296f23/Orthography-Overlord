@@ -70,15 +70,26 @@ class AudioManager {
 class WordDifficultyManager {
     constructor() {
         this.difficulty = 0;
+        this.wordmap = new Map();
     }
 
     calculateWordListDifficulty(wordList) {
         for(var word of wordList) {
             try {
                 this.calculateDifficulty(word);
+                if(this.wordmap.has(this.difficulty)) {
+                    this.wordmap.get(this.difficulty).push(word);
+                }
+                else{
+                    this.wordmap.set(this.difficulty, [word]);
+                }
             } catch(e) {
                 console.error("Could not read word.", e);
             }
+        }
+        console.log(this.wordmap);
+        for(var key of this.wordmap.keys()) {
+            console.log(this.wordmap.get(key));
         }
     }
 
@@ -87,8 +98,7 @@ class WordDifficultyManager {
         let letter_component = (25*this.letterFrequencyCalc(currentWord));
         let consonant_component = (25*this.consonantSequenceCount(currentWord));
         let vowel_component = (25*this.vowelSequenceCount(currentWord));
-        this.difficulty = length_component + letter_component + consonant_component + vowel_component;
-        console.log(this.difficulty)
+        this.difficulty = Math.floor(length_component + letter_component + consonant_component + vowel_component);
     }
 
     wordLengthDifficulty(currentWord) {
