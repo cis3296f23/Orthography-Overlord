@@ -82,6 +82,7 @@ class AudioManager {
     }
 }
 
+
 class HintManager {
     constructor(_hintDisplay) {
         this.hintDisplay = _hintDisplay;
@@ -114,6 +115,7 @@ class HintManager {
     
 }
 
+
 class GameManager {
     constructor(_inputContainer, _wordSound, _hintText, _answerSound) {
         this.inputManager = new InputManager(_inputContainer);
@@ -129,7 +131,6 @@ class GameManager {
     async setupGame(wordList) {
         this.wordList = wordList;
         await this.audioManager.loadAudioForCurrentGame(wordList);
-
         this.currentWordIndex = 0;
         this.loadWord();
     }
