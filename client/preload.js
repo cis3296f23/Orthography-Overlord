@@ -3,12 +3,15 @@ const { contextBridge, ipcRenderer } = require('electron')
 const PAGES = {
     "MENU": "menu.html",
     "GAME": "game.html",
+    "SETTINGS": "game.html",    //placeholder
+    "CONTINUE": "game.html",    //placeholder
 }
 
 function switchPage(pagename) {
     if(pagename in PAGES) {
         ipcRenderer.send('load-html', PAGES[pagename]);
     } else {
+        console.log(PAGES[pagename]);
         console.log("ERROR: BAD PAGE LOAD!");
     }
 
