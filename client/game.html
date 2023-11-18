@@ -2,31 +2,43 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <title>Orthography Overlord</title>
     <link rel="stylesheet" href="./public/style/main.css">
     <script src="./public/logic/gameLogic.js"></script>
   </head>
   <body>
-    <audio disablewebsecurity crossorigin id="primaryAudio" src="./public/sounds/comedy_sound.wav"></audio>
+    <audio id="primaryAudio" src="./public/sounds/comedy_sound.wav"></audio>
     <audio id="answerSound"></audio>
     
+    <div class="hidden" id="scoreModalWrapper">
+      <div id="scoreModal">
+        <div id="scoreModalContent">
+          <img id="scoreCrown" src="./public/images/crown.png"> 
+
+          <h2> You Won! Congrats! </h2>
+          <!-- Time Attack: Score = Time Spent-->
+          <!-- 2.5 expected guesses per word? Excellent or Great or Good -->
+          <!-- Normal Play: Score = % Correct -->
+          <!-- Revenge Factor: # Of Previously Mispelled, Now Corrected -->
+          <div id="scoreBorder">
+            <p> YOUR SCORE </p>
+            <h1 id="scoreText"> You got 1/20 words correct. </h1>
+          </div>
+          <button id="scoreModalButton">Back to Menu</button>
+        </div>
+      </div>
+    </div>
+
     <div id="topDisplayWrapper">
         <div id="topDisplayContent"> 
-            <img id="alien" class="hidden" src="./public/images/alien.jpg" alt="1" width="100" height="100">
-
-            <button id="myButton">Exit Game</button>
-            <button id="replayButton">Replay Word</button>
+            <button tabindex="-1" id="quitButton">Exit Game</button>
+            <button tabindex="-1" id="replayButton">Replay Word</button>
             <h1 id="hintText"></h1>
         </div>
-
     </div>
 
     <div class="typezone">
-        <div id="inputContainer" class="letters">
-
-        </div>    
+        <div id="inputContainer" class="letters"></div>    
     </div>
   </body>
 

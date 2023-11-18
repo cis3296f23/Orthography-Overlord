@@ -1,7 +1,9 @@
 body {
     background-color: rgb(27, 61, 68);
-    color: #fff;
+    color: #F1F4F9;
     margin: 0;
+    padding: 0px;
+    margin: 0px;
 }
 
 #inputContainer {
@@ -37,7 +39,7 @@ body {
     font-family: Arial, sans-serif;
 }
 /* Buttons */
-#replayButton {
+#replayButton, #scoreModalButton {
     background-color: #057108;
     bottom: 20%;
     left: 40%;
@@ -50,11 +52,11 @@ body {
     outline: none;
 }
   
-#replayButton:hover {
+#replayButton:hover, #scoreModalButton:hover {
     background-color: #003002;
 }
 /* Button for returning to main menu */
-#myButton {
+#quitButton {
     position: fixed;
     top: 10px;
     left: 10px;
@@ -66,11 +68,9 @@ body {
     cursor: pointer;
 }
 
-#myButton:hover {
+#quitButton:hover {
     background-color: #400000;
 }
-
-
 
 .letters input {
     width: 60px;
@@ -88,5 +88,79 @@ body {
 }
 
 .hidden {
-    display: none
+    display: none !important;
+}
+
+#scoreModalWrapper {
+    animation: appear 0.5s ease-in-out;
+    z-index: 10;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3)
+}
+
+#scoreModal {
+    position: relative;
+    margin-top: 120px;
+    width: 400px;
+    height: 300px;
+    border: 5px #e69d02 solid;
+    border-radius: 30px;
+    background-color: #1B4965;
+}
+
+#scoreModalContent {
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 30px;
+    text-align: center;
+}
+
+#scoreBorder {
+    background-color: #0D2331;
+    border-radius: 50px;
+    border: 5px solid #e69d02;
+}
+
+#scoreBorder p {
+    margin: 0px;
+    padding: 0px;
+    margin-top: 10px;
+}
+
+#scoreBorder h1 {
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 10px;
+    font-size: 25pt;
+}
+
+#scoreModalContent * {
+    width: 100%;
+}
+
+#scoreCrown {
+    margin-right: 30px;
+    top: -90px;
+    width: 140px;
+    height: auto;
+    position: absolute;
+}
+
+#scoreModalButton {
+    margin-top: 30px;
+}
+
+@keyframes appear {
+    100% {
+        opacity: 1;
+    }
+    0% {
+        opacity: 0;
+    }
 }

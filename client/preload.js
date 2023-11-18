@@ -11,11 +11,7 @@ function switchPage(pagename) {
     } else {
         console.log("ERROR: BAD PAGE LOAD!");
     }
-
-    // page list... names with html?
-    // ipcrenderer send loadpage?
 }
-
 
 async function loadAudioForWord(word) {
     return new Promise((resolve, reject) => {
