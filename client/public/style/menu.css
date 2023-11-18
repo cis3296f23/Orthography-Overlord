@@ -5,6 +5,7 @@ body {
     height: 100vh;
     margin: 0;
     background: url("../../public/images/reaper.png") center center fixed;
+    /*Ivakhnenko-art*/
     background-size: cover;
 }
 
