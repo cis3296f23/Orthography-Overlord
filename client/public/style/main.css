@@ -8,6 +8,28 @@ body {
 
 }
 
+#circleContainer {
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+#circleContainer span {
+    width: 30px;
+    height: 30px;
+    margin-top: 50px;
+    border-radius: 50px;
+    border: 10px solid white;
+    background-color: white
+}
+
+#circleContainer span.complete {
+    background-color: green;
+    content: "🎮"
+}
+
 
 #inputContainer, .fallZone {
     width: 100%;
@@ -16,7 +38,6 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     position: relative;
-
 }
 
 .fallZone {
@@ -30,9 +51,10 @@ body {
 }
 
 #topDisplayContent {
+    max-width: 600px;
     position: relative;
     width: 100%;
-    padding: 120px;
+    padding: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
