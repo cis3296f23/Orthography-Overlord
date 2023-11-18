@@ -30,8 +30,6 @@ class InputManager {
     onBackspace() {
         if(this.currentInputBoxes.length > 0) {
             this.inputContainer.removeChild(this.currentInputBoxes.pop());
-        } else {
-            // INDICATE THAT USER COULD NOT DELTE WITH A SCREENSHAKE OR SOUND
         }
     }
 
@@ -40,7 +38,6 @@ class InputManager {
         this.inputContainer.innerHTML = "";
     }
 }
-
 
 class AudioManager {
     constructor(_wordSound, _answerSound) {
@@ -82,10 +79,12 @@ class AudioManager {
     }
 }
 
-
 class HintManager {
     constructor(_hintDisplay) {
         this.hintDisplay = _hintDisplay;
+        this.hintsForCurrentWord = 0;
+        // map to word later
+        this.hintHistory = [];
     }
 
     hintConstructor(currentWord, userInput) {
@@ -101,6 +100,8 @@ class HintManager {
             }
             break;
         }
+
+        this.hintsForCurrentWord++;
         return hint;
     }
     
@@ -110,32 +111,91 @@ class HintManager {
     }
 
     clearHint() {
+        this.hintHistory.push(this.hintsForCurrentWord);
+        this.hintsForCurrentWord = 0;
         this.hintDisplay.innerHTML = ""
+    }
+
+}
+
+class ScoreManager {
+
+    constructor(_scoreModal, _scoreDisplay, _scoreGrade) {
+        this.scoreModal = _scoreModal;
+        this.scoreDisplay = _scoreDisplay;
+        this.scoreGrade = _scoreGrade;
+        this.score = 100;
+    }
+    
+
+    calculateAndDisplayScore(hintHistory, wordCount) {
+        var perWordScore = 100 / wordCount;
+
+        for(var hints of hintHistory) {
+            switch(hints) {
+                case 0:
+                    break;
+                case 1:
+                    this.score -= 0.2 * perWordScore;
+                    break;
+                case 2: 
+                    this.score -= 0.4 * perWordScore;
+                    break;
+                case 3:
+                    this.score -= 0.7 * perWordScore;
+                    break;
+                default:
+                    this.score -= perWordScore;
+            }
+        }
+
+        var grade = "D";
+        if(this.score == 100) {
+            grade = "S+";
+        } else if(this.score > 90) {
+            grade = "A";
+        } else if(this.score > 85) {
+            grade = "A-";
+        } else if(this.score > 80) {
+            grade = "B";
+        } else if(this.score > 70) {
+            grade = "C";
+        }
+
+        this.scoreModal.classList.toggle("hidden");
+        this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
+        this.scoreGrade.innerHTML = `${grade}`
     }
     
 }
 
-
 class GameManager {
-    constructor(_inputContainer, _wordSound, _hintText, _answerSound) {
-        this.inputManager = new InputManager(_inputContainer);
-        this.audioManager = new AudioManager(_wordSound, _answerSound);
-        this.hintManager = new HintManager(_hintText); 
-
-        this.wordAddedToBack = false;
+    constructor(gameElements) {
+        this.inputManager = new InputManager(gameElements.inputContainer);
+        this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
+        this.hintManager = new HintManager(gameElements.hintText); 
+        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade);
 
         this.wordList = [];
+        this.startingWordCount = 0;
+
+        this.wordAddedToBack = false;
         this.currentWordIndex = 0;
+
+        this.gameActive = false;
     }
     
     async setupGame(wordList) {
         this.wordList = wordList;
+        this.startingWordCount = wordList.length;
         await this.audioManager.loadAudioForCurrentGame(wordList);
         this.currentWordIndex = 0;
         this.loadWord();
     }
 
     nextWord() {
+        this.gameActive = false;
+        // loadword sets gameactive to true
         this.audioManager.playAnswerSound(true);
         if(this.currentWordIndex < this.wordList.length-1) {
             this.currentWordIndex++;
@@ -143,7 +203,7 @@ class GameManager {
                 this.loadWord();
             }, 800);
         } else {
-            window.electronAPI.switchPage("MENU");
+            this.completeGame();
         }
     }
     
@@ -151,13 +211,16 @@ class GameManager {
         this.audioManager.setAudioForWord(this.wordList[this.currentWordIndex]);
         this.inputManager.clearInput();
         this.wordAddedToBack = false;
+        this.gameActive = true;
     }
 
     onTypeLetter = (e) => {
+        if(!this.gameActive) return;
+
         let key = e.key.toLowerCase();
         
         if(key == "enter") {
-            this.checkForWin();
+            this.checkCorrectWord();
         } else if(key == "backspace") {
             this.inputManager.onBackspace();
         } else if(key.length == 1 && "abcdefghijklmnopqrstuvwxyz".includes(key)) {
@@ -165,7 +228,7 @@ class GameManager {
         }
     }
 
-    checkForWin() {
+    checkCorrectWord() {
         if(this.inputManager.getEnteredLetters() == this.wordList[this.currentWordIndex]) {
             this.hintManager.clearHint();
             this.nextWord();
@@ -178,34 +241,38 @@ class GameManager {
         }
 
         this.audioManager.playAnswerSound(false);
-
         this.hintManager.displayHint(this.wordList[this.currentWordIndex], this.inputManager.getEnteredLetters());
         this.inputManager.clearInput();
         return false;
+    }
+
+    completeGame() {
+        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.startingWordCount)
     }
 }
 
 
 window.addEventListener('DOMContentLoaded', () => {
     const replayButton = document.getElementById('replayButton');
-    const wordSound = document.getElementById('primaryAudio');
-    const hintText = document.getElementById('hintText')
-    const inputContainer = document.getElementById('inputContainer');
-    const answerSound = document.getElementById('answerSound');
-    
-    const game = new GameManager(inputContainer, wordSound, hintText, answerSound);
+    const quitButton = document.getElementById('quitButton');
+    const scoreModalButton = document.getElementById('scoreModalButton');
 
+    const gameElements = {
+        hintText: document.getElementById('hintText'),
+        inputContainer: document.getElementById('inputContainer'),
+        wordChannel: document.getElementById('primaryAudio'),
+        answerChannel: document.getElementById('answerSound'),
+        scoreModal: document.getElementById('scoreModalWrapper'),
+        scoreText: document.getElementById('scoreText'),
+        scoreGrade: document.getElementById('scoreGrade'),
+    }
+
+    const game = new GameManager(gameElements);
+
+    replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); });
     document.addEventListener("keydown", game.onTypeLetter);
+    scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
+    quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
 
-    replayButton.addEventListener('click', () => {
-        wordSound.play();
-        // Remove focus from the button to prevent automatic triggering on Enter
-        replayButton.blur();
-    });
-
-    document.getElementById('myButton').addEventListener('click', () => {
-        window.electronAPI.switchPage("MENU");
-    });
-
-    game.setupGame(["barnacle", "vinegar", "phylum", "melee", "meiosis", "pharaoh"]);
+    game.setupGame(["barnacle", "python", "cousin", "oyster", "opportunity", "world"]);
 });
