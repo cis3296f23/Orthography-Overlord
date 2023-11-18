@@ -2,6 +2,7 @@ class InputManager {
     constructor(_inputContainer) {
         this.inputContainer = _inputContainer;
         this.currentInputBoxes = [];
+        this.fallZones = [];
     }
 
     createInputBox() {
@@ -34,9 +35,35 @@ class InputManager {
     }
 
     clearInput() {
+        if(this.currentInputBoxes.length == 0) {
+            return;
+        }
+        var fallZone = document.createElement("div");
+        fallZone.classList.add("fallZone","letters");
+
+        for(var box of this.currentInputBoxes) {
+   
+            var duration = (Math.random() * 0.1) + 1;
+            box.style.animation = `fall ${duration}s ease-in forwards`;
+            fallZone.append(box);
+        }
+
+        this.inputContainer.appendChild(fallZone);
         this.currentInputBoxes = [];
-        this.inputContainer.innerHTML = "";
+
+        this.fallZones.push(fallZone);
+
+        setTimeout(() => {
+            this.inputContainer.removeChild(this.fallZones.shift());
+        }, 1000 * duration)
     }
+
+    flashGood() {
+        for(var box of this.currentInputBoxes) {
+            box.style.animation = `success 0.3s ease forwards`;
+        }
+    }
+
 }
 
 class AudioManager {
@@ -127,7 +154,6 @@ class ScoreManager {
         this.score = 100;
     }
     
-
     calculateAndDisplayScore(hintHistory, wordCount) {
         var perWordScore = 100 / wordCount;
 
@@ -231,6 +257,7 @@ class GameManager {
     checkCorrectWord() {
         if(this.inputManager.getEnteredLetters() == this.wordList[this.currentWordIndex]) {
             this.hintManager.clearHint();
+            this.inputManager.flashGood();
             this.nextWord();
             return true;
         }
