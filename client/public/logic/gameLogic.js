@@ -120,9 +120,10 @@ class HintManager {
 
 class ScoreManager {
 
-    constructor(_scoreModal, _scoreDisplay) {
+    constructor(_scoreModal, _scoreDisplay, _scoreGrade) {
         this.scoreModal = _scoreModal;
         this.scoreDisplay = _scoreDisplay;
+        this.scoreGrade = _scoreGrade;
         this.score = 100;
     }
     
@@ -150,7 +151,7 @@ class ScoreManager {
 
         var grade = "D";
         if(this.score == 100) {
-            grade = "O!";
+            grade = "S+";
         } else if(this.score > 90) {
             grade = "A";
         } else if(this.score > 85) {
@@ -162,7 +163,8 @@ class ScoreManager {
         }
 
         this.scoreModal.classList.toggle("hidden");
-        this.scoreDisplay.innerHTML = `${Math.round(this.score)} % (${grade})`;
+        this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
+        this.scoreGrade.innerHTML = `${grade}`
     }
     
 }
@@ -172,7 +174,7 @@ class GameManager {
         this.inputManager = new InputManager(gameElements.inputContainer);
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
         this.hintManager = new HintManager(gameElements.hintText); 
-        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText);
+        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade);
 
         this.wordList = [];
         this.startingWordCount = 0;
@@ -262,6 +264,7 @@ window.addEventListener('DOMContentLoaded', () => {
         answerChannel: document.getElementById('answerSound'),
         scoreModal: document.getElementById('scoreModalWrapper'),
         scoreText: document.getElementById('scoreText'),
+        scoreGrade: document.getElementById('scoreGrade'),
     }
 
     const game = new GameManager(gameElements);

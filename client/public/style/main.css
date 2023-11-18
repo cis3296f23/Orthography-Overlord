@@ -4,6 +4,8 @@ body {
     margin: 0;
     padding: 0px;
     margin: 0px;
+    font-family: Arial, sans-serif;
+
 }
 
 #inputContainer {
@@ -36,7 +38,6 @@ body {
     font-size: 20pt;
     text-align: center;
     margin-bottom: 20px;
-    font-family: Arial, sans-serif;
 }
 /* Buttons */
 #replayButton, #scoreModalButton {
@@ -82,7 +83,6 @@ body {
     border-radius: 15px;
     font-size: 25pt;
     text-transform: uppercase;
-    font-family: Arial, sans-serif;
     color: black;
     background-color: rgb(76, 159, 177);
 }
@@ -113,7 +113,6 @@ body {
 }
 
 #scoreModalContent {
-    font-family: Arial, Helvetica, sans-serif;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -150,6 +149,15 @@ body {
     width: 140px;
     height: auto;
     position: absolute;
+}
+
+#scoreGrade {
+    position: absolute;
+    right: -30px;
+    top: -80px;
+    text-shadow: 5px 5px black;
+    font-size: 50pt;
+    transform: rotateZ(10deg);
 }
 
 #scoreModalButton {
