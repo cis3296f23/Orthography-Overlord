@@ -21,7 +21,7 @@ button {
     color: #f10303;
     padding: 10px 20px;
     margin-bottom: 1vw;
-    background-color: rgba(54, 44, 44, 0.1);
+    background-color: rgba(0, 0, 0, 0.09);
     border: none;
     position: relative;
     outline:none;
@@ -36,7 +36,7 @@ button:hover::before {
     left: 0;
     bottom: 0;
     opacity: 0;
-    animation: lightning 0.5s ease-in-out infinite;
+    animation: lightning 0.9s ease-in-out infinite;
 }
 
 .lightning-effect::before {
@@ -48,7 +48,7 @@ button:hover::before {
     left: 0;
     bottom: 0;
     opacity: 0;
-    animation: lightning 0.5s ease-in-out infinite;
+    animation: lightning 0.9s ease-in-out infinite;
 }
 
 @keyframes lightning {
