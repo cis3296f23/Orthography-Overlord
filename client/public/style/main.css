@@ -8,12 +8,19 @@ body {
 
 }
 
-#inputContainer {
+
+#inputContainer, .fallZone {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
+    position: relative;
+
+}
+
+.fallZone {
+    position: absolute;
 }
 
 #topDisplayWrapper {
@@ -170,5 +177,34 @@ body {
     }
     0% {
         opacity: 0;
+    }
+}
+
+
+@keyframes fall {
+    100% {
+        transform: translateY(500px) rotateZ(5deg);
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    0% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+@keyframes success {
+    0% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 0.6;
+        background-color: #057108;
+    }
+    100% {
+        opacity: 1;
+        background-color: rgb(76, 159, 177);
     }
 }
