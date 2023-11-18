@@ -30,8 +30,6 @@ class InputManager {
     onBackspace() {
         if(this.currentInputBoxes.length > 0) {
             this.inputContainer.removeChild(this.currentInputBoxes.pop());
-        } else {
-            // INDICATE THAT USER COULD NOT DELTE WITH A SCREENSHAKE OR SOUND
         }
     }
 
@@ -127,7 +125,7 @@ class ScoreManager {
         this.scoreDisplay = _scoreDisplay;
         this.score = 100;
     }
-
+    
 
     calculateAndDisplayScore(hintHistory, wordCount) {
         var perWordScore = 100 / wordCount;
@@ -150,8 +148,21 @@ class ScoreManager {
             }
         }
 
+        var grade = "D";
+        if(this.score == 100) {
+            grade = "O!";
+        } else if(this.score > 90) {
+            grade = "A";
+        } else if(this.score > 85) {
+            grade = "A-";
+        } else if(this.score > 80) {
+            grade = "B";
+        } else if(this.score > 70) {
+            grade = "C";
+        }
+
         this.scoreModal.classList.toggle("hidden");
-        this.scoreDisplay.innerHTML = `${Math.round(this.score)} % `;
+        this.scoreDisplay.innerHTML = `${Math.round(this.score)} % (${grade})`;
     }
     
 }
@@ -260,5 +271,5 @@ window.addEventListener('DOMContentLoaded', () => {
     scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
     quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
 
-    game.setupGame(["barnacle"]);
+    game.setupGame(["barnacle", "python", "cousin", "oyster", "opportunity", "world"]);
 });
