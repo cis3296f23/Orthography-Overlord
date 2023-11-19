@@ -454,5 +454,5 @@ window.addEventListener('DOMContentLoaded', () => {
     scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
     quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
 
-    game.setupGame(["barnacle", "python", "alabaster", "gneiss"]);
+    game.setupGame(["barnacle", "python", "alabaster", "gneiss", "basin", "sediment", "shale", "metamorphic"]);
 });
