@@ -144,36 +144,4 @@ class WordDifficultyManager {
     }
 }
 
-class HintManager {
-    constructor(_hintDisplay) {
-        this.hintDisplay = _hintDisplay;
-    }
-
-    hintConstructor(currentWord, userInput) {
-        const input_len = userInput.length;
-        let hint = "";
-        for (let i = 0; i < currentWord.length - 1; i++) {
-            if (i < input_len && currentWord[i] === userInput[i]) {
-                hint += currentWord[i].toUpperCase();
-                continue;
-            }
-            if (hint.length + 1 < currentWord.length) {
-                hint += currentWord[i].toUpperCase();
-            }
-            break;
-        }
-        return hint;
-    }
-    
-    displayHint(currentWord, userInput) {
-        let hint = this.hintConstructor(currentWord, userInput)
-        this.hintDisplay.innerHTML = "Hint: " + hint
-    }
-
-    clearHint() {
-        this.hintDisplay.innerHTML = ""
-    }
-    
-};
-
 module.exports = WordDifficultyManager;
