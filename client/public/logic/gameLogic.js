@@ -467,7 +467,52 @@ class GameManager {
 }
 
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+    // GAME SETTINGS
+    let numWords = 5; 
+
+    // Event listeners for keyboard navigation of the game settings
+    const radioButtons = document.querySelectorAll('input[name="numWords"]');
+    function handleKeyPress(event) {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            const currentIndex = Array.from(radioButtons).findIndex(button => button.checked);
+            const offset = (event.key === 'ArrowRight') ? 1 : -1;
+            const nextIndex = (currentIndex + offset + radioButtons.length) % radioButtons.length;
+            radioButtons[nextIndex].checked = true;
+        }
+    }
+    document.addEventListener('keydown', handleKeyPress);
+    document.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            document.getElementById('continueButton').click();
+        }
+    });
+
+    // Create a promise that will be resolved when the continueButton is clicked
+    const continuePromise = new Promise(resolve => {
+        const continueButton = document.getElementById('continueButton');
+        continueButton.addEventListener('click', function () {
+            const radioButtons = document.getElementsByName("numWords");
+            for (const radioButton of radioButtons) {
+                if (radioButton.checked) {
+                    numWords = parseInt(radioButton.value);
+                    break;
+                }
+            }
+            document.getElementById('gameSettings').style.display = 'none';
+            document.getElementById('circleContainer').classList.remove('hidden');
+            document.getElementById('topDisplayWrapper').classList.remove('hidden');
+            document.getElementsByClassName('typezone')[0].classList.remove('hidden');
+
+            // Remove the keyboard event listener
+            document.removeEventListener('keydown', handleKeyPress);
+            resolve();
+        });
+    });
+    // Wait for the promise to be resolved before continuing
+    await continuePromise;
+
+
     const replayButton = document.getElementById('replayButton');
     const quitButton = document.getElementById('quitButton');
     const scoreModalButton = document.getElementById('scoreModalButton');
@@ -493,5 +538,5 @@ window.addEventListener('DOMContentLoaded', () => {
     scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
     quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
 
-    game.setupGame(10);
+    game.setupGame(numWords);
 });
