@@ -11,23 +11,83 @@ body {
 #circleContainer {
     width: 60%;
     margin: 0 auto;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-}
-
-#circleContainer span {
-    width: 30px;
-    height: 30px;
     margin-top: 50px;
-    border-radius: 50px;
-    border: 10px solid white;
-    background-color: white
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
 }
 
-#circleContainer span.complete {
+#circleContainer div {
+    width: 35px;
+    height: 35px;
+    border-radius: 50px;
+    border: 4px solid white;
+    background-color: none;
+    position: relative;
+    margin: 10px;
+}
+
+.circlemark {
+    position: absolute;
+    height: 35px;
+    width: 35px;
+}
+
+@keyframes completed {
+    100% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 0.6;
+    }
+    0% {
+        opacity: 1;
+    }
+}
+
+
+#circleContainer div.retry {
+    border-color: rgb(255, 91, 7);
+}
+
+#circleContainer div.retry.complete {
+    background-color: orange;
+}
+
+#circleContainer div.complete {
     background-color: green;
-    content: "🎮"
+}
+
+#circleContainer div.failed {
+    background-color: rgb(78, 6, 6);
+}
+
+#circleContainer div.current {
+    border-color: gold !important;
+}
+
+#circleContainer div.transparent {
+    opacity: 0;
+}
+
+#circleContainer div.failed.animating {
+    animation: completed 0.2s;
+    transition: 0.5s;
+}
+
+#circleContainer div.complete.animating {
+    animation: completed 0.2s;
+    transition: 0.5s;
+}
+
+#circleContainer div.fall {
+    animation: fall 0.4s;
+}
+
+#circleContainer div.appear {
+    opacity: 1;
+    transition: 4s
 }
 
 
@@ -54,7 +114,7 @@ body {
     max-width: 600px;
     position: relative;
     width: 100%;
-    padding: 150px;
+    padding: 130px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -121,6 +181,7 @@ body {
 }
 
 #scoreModalWrapper {
+    top: 0px;
     animation: appear 0.5s ease-in-out;
     z-index: 10;
     position: absolute;
@@ -133,7 +194,7 @@ body {
 
 #scoreModal {
     position: relative;
-    margin-top: 120px;
+    margin-top: 170px;
     width: 400px;
     height: 300px;
     border: 5px #e69d02 solid;

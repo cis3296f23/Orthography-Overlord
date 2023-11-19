@@ -1,3 +1,106 @@
+class CircleManager {
+    constructor(_circleContainer, _gameManager) {
+        this.circleContainer = _circleContainer
+        this.gameManager = _gameManager
+        this.maxCircles = 30;
+        this.offsetAmount = 5;
+        this.offset = 0;
+        this.circleList = [];
+        this.lastWordDataLength = -1
+    }
+
+    makeMark(succeed, retry) {
+        var mark = document.createElement("img");
+        if(succeed) {
+            if(retry) {
+                mark.src = "./public/images/yellowcheck.png";
+            } else {
+                mark.src = "./public/images/greencheck.png";
+            }
+        } else {
+            mark.src = "./public/images/redx.png";
+        }
+
+        mark.classList.add("circlemark");
+        return mark;
+    }
+
+    displayCircles() {
+        if(this.lastWordDataLength == Object.keys(this.gameManager.wordData).length) {
+            if(!this.gameManager.allWordsSeen) {
+                return;
+            }
+        } else {
+            this.lastWordDataLength = Object.keys(this.gameManager.wordData).length;
+        }
+
+        this.circleList = [];
+        this.circleContainer.innerHTML = "";
+
+        if(this.gameManager.currentWordIndex+1 > this.maxCircles + this.offset) {
+            this.offset += this.offsetAmount;
+        }
+
+        var firstUncompleted = -1;
+        for(var x=this.offset; x<this.maxCircles + this.offset; x++) {
+            
+            if(x >= this.gameManager.wordList.length) {
+                continue;
+            }
+
+            const retry = this.gameManager.wordList[x].data == "retry" || this.gameManager.wordList[x].data == "redeemed";
+            const seen = this.gameManager.wordData[x] != undefined;
+            
+
+            var circle = this.addCircle();
+
+            if(retry) { circle.classList.add("retry"); }
+            
+            if(seen) {
+                var success = this.gameManager.wordData[x];
+                circle.classList.add(success ? "complete" : "failed")
+                var mark = this.makeMark(success, retry);
+                circle.appendChild(mark);
+            } else if(firstUncompleted == -1) {
+                firstUncompleted = (x - this.offset);
+            }
+        }
+        
+        if(this.gameManager.allWordsSeen) {
+            for(var x=this.offset; x<this.maxCircles + this.offset; x++) {
+                const retry = this.gameManager.wordList[x].data == "retry" 
+                if(retry) {
+                    firstUncompleted = x;
+                    break;
+                }
+            }
+        }
+        
+        if(firstUncompleted != -1) {
+            this.circleList[firstUncompleted].classList.add("current");
+        
+            if(this.gameManager.currentWordIndex != 0 && !this.gameManager.allWordsSeen) {
+                this.circleList[firstUncompleted-1].classList.add("animating")
+            } else if(this.gameManager.allWordsSeen) {
+                this.circleList[firstUncompleted].classList.add("animating");
+            }
+        }
+    }
+
+    addDummy() {
+        var dummy = document.createElement("div");
+        dummy.classList.add("transparent");
+        this.circleContainer.append(dummy);
+    }
+    
+    addCircle() {
+        var circle = document.createElement("div");
+        this.circleContainer.append(circle);
+        this.circleList.push(circle);
+        return circle;
+    }
+}
+
 class InputManager {
     constructor(_inputContainer) {
         this.inputContainer = _inputContainer;
@@ -201,21 +304,28 @@ class GameManager {
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
         this.hintManager = new HintManager(gameElements.hintText); 
         this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade);
+        this.circleManager = new CircleManager(gameElements.circleContainer, this);
 
         this.wordList = [];
+        this.wordData = [];
+
         this.startingWordCount = 0;
 
         this.wordAddedToBack = false;
         this.currentWordIndex = 0;
 
         this.gameActive = false;
+        this.allWordsSeen = false;
     }
     
     async setupGame(wordList) {
-        this.wordList = wordList;
+        this.wordList = wordList.map((w) => {
+            return {w: w, data: "original"};
+        });
         this.startingWordCount = wordList.length;
         await this.audioManager.loadAudioForCurrentGame(wordList);
         this.currentWordIndex = 0;
+        this.circleManager.displayCircles();
         this.loadWord();
     }
 
@@ -223,18 +333,45 @@ class GameManager {
         this.gameActive = false;
         // loadword sets gameactive to true
         this.audioManager.playAnswerSound(true);
-        if(this.currentWordIndex < this.wordList.length-1) {
+        if(this.currentWordIndex < this.wordList.length-1 && !this.allWordsSeen) {
             this.currentWordIndex++;
             setTimeout(() => {
                 this.loadWord();
             }, 800);
         } else {
-            this.completeGame();
+            // if 
+            this.allWordsSeen = true;
+
+            var retryWords = this.wordList.filter((word) => {
+                return word.data == "retry";
+            }).sort((a, b) => {
+                return b.index - a.index;
+            })
+
+
+
+            if(retryWords.length > 0) {
+                var retryable = retryWords.pop();
+                if(retryable.index == this.lastIndex && retryWords.length > 1) {
+                    retryable = retryWords.pop();
+                }
+                this.currentWordIndex = retryable.index;
+                this.lastIndex = retryable.index;
+                
+                setTimeout(() => {
+                    this.loadWord();
+                }, 800);
+            } else {
+                this.completeGame();
+            }
         }
+
+        this.circleManager.displayCircles();
+
     }
     
     loadWord() {
-        this.audioManager.setAudioForWord(this.wordList[this.currentWordIndex]);
+        this.audioManager.setAudioForWord(this.wordList[this.currentWordIndex].w);
         this.inputManager.clearInput();
         this.wordAddedToBack = false;
         this.gameActive = true;
@@ -255,21 +392,35 @@ class GameManager {
     }
 
     checkCorrectWord() {
-        if(this.inputManager.getEnteredLetters() == this.wordList[this.currentWordIndex]) {
+        if(this.inputManager.getEnteredLetters() == this.wordList[this.currentWordIndex].w) {
             this.hintManager.clearHint();
             this.inputManager.flashGood();
+            if(!this.wordAddedToBack) {
+                this.wordData[this.currentWordIndex] = true;
+            }
+
+            if(this.wordList[this.currentWordIndex].data == "retry" && this.allWordsSeen && !this.wordAddedToBack) {
+                this.wordData[this.currentWordIndex] = true;
+                this.wordList[this.currentWordIndex].data = "redeemed"; 
+            }
+
             this.nextWord();
             return true;
         }
 
         if(!this.wordAddedToBack) {
-            this.wordList.push(this.wordList[this.currentWordIndex])
+            this.wordList[this.currentWordIndex].data = "retry";
+            this.wordList[this.currentWordIndex].index = this.currentWordIndex;
+            // var copyWord = {w: this.wordList[this.currentWordIndex].w, data: "retry"}
+            // this.wordList.push(copyWord);
             this.wordAddedToBack = true;
         }
 
+        this.wordData[this.currentWordIndex] = false;
         this.audioManager.playAnswerSound(false);
-        this.hintManager.displayHint(this.wordList[this.currentWordIndex], this.inputManager.getEnteredLetters());
+        this.hintManager.displayHint(this.wordList[this.currentWordIndex].w, this.inputManager.getEnteredLetters());
         this.inputManager.clearInput();
+
         return false;
     }
 
@@ -292,14 +443,16 @@ window.addEventListener('DOMContentLoaded', () => {
         scoreModal: document.getElementById('scoreModalWrapper'),
         scoreText: document.getElementById('scoreText'),
         scoreGrade: document.getElementById('scoreGrade'),
+        circleContainer: document.getElementById('circleContainer')
     }
 
     const game = new GameManager(gameElements);
 
-    replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); });
+    replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); 
+    replayButton.blur()});
     document.addEventListener("keydown", game.onTypeLetter);
     scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
     quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
 
-    game.setupGame(["barnacle", "python", "cousin", "oyster", "opportunity", "world"]);
+    game.setupGame(["barnacle", "python", "alabaster", "gneiss"]);
 });
