@@ -487,6 +487,17 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('continueButton').click();
         }
     });
+    // Event listeners for going back to main menu
+    const switchToMenu = () => {
+        window.electronAPI.switchPage("MENU");
+    };
+    const settingsQuitButton = document.getElementById('settingsQuitButton');
+    settingsQuitButton.addEventListener('click', switchToMenu);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' || event.code === 'Escape') {
+            switchToMenu();
+        }
+    });
 
     // Create a promise that will be resolved when the continueButton is clicked
     const continuePromise = new Promise(resolve => {
@@ -512,11 +523,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Wait for the promise to be resolved before continuing
     await continuePromise;
 
-
-    const replayButton = document.getElementById('replayButton');
-    const quitButton = document.getElementById('quitButton');
-    const scoreModalButton = document.getElementById('scoreModalButton');
-
     const gameElements = {
         hintText: document.getElementById('hintText'),
         inputContainer: document.getElementById('inputContainer'),
@@ -529,14 +535,17 @@ window.addEventListener('DOMContentLoaded', async () => {
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordSetPath: "./public/word-sets/foods.csv",
     }
-
     const game = new GameManager(gameElements);
+
+    const replayButton = document.getElementById('replayButton');
+    const quitButton = document.getElementById('quitButton');
+    const scoreModalButton = document.getElementById('scoreModalButton');
 
     replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); 
     replayButton.blur()});
     document.addEventListener("keydown", game.onTypeLetter);
-    scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
-    quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
+    scoreModalButton.addEventListener('click', switchToMenu);
+    quitButton.addEventListener('click', switchToMenu);
 
     game.setupGame(numWords);
 });

@@ -1,0 +1,47 @@
+#gameSettings {
+    text-align: center;
+    margin: 20px;
+  }
+  h2 {
+    font-size: 24px;   /* Adjust the font size as needed */
+    color: #74a717;       /* Set a color for the title */
+    margin-bottom: 10px; /* Add some space between the title and other elements */
+  }
+  
+  label {
+    margin-right: 10px;
+  }
+  
+  input[type="radio"] {
+    margin-left: 5px;
+  }
+  
+  #continueButton {
+    display: block;
+    margin: 10px auto;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  #settingsQuitButton {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 10px 20px;
+    background-color: #870000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+  #continueButton:hover {
+    background-color: #45a049;
+  }
+  
+  

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Orthography Overlord</title>
     <link rel="stylesheet" href="./public/style/main.css">
+    <link rel="stylesheet" href="./public/style/gameSettings.css">
     <script src="./public/logic/gameLogic.js"></script>
   </head>
   <body>
@@ -11,6 +12,7 @@
     <audio id="answerSound"></audio>
 
     <div id="gameSettings">
+      <h2>Game Options</h2>
       <label for="numWords">Number of Words:</label>
       
       <input type="radio" id="numWords5" name="numWords" value="5" checked>
@@ -31,7 +33,8 @@
       <input type="radio" id="numWords30" name="numWords" value="30">
       <label for="numWords30">30</label>
     
-      <button id="continueButton">Continue</button>
+      <button tabindex="-1" id="continueButton">Continue</button>
+      <button tabindex="-1" id="settingsQuitButton">Exit Game</button>
     </div>
       
       
