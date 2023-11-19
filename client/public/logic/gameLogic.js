@@ -1,3 +1,4 @@
+const fs = window.electronAPI.fs;
 class CircleManager {
     constructor(_circleContainer, _gameManager) {
         this.circleContainer = _circleContainer
@@ -297,6 +298,40 @@ class ScoreManager {
     }
     
 }
+class WordQueueManager {
+    constructor(wordSetPath) {
+        this.wordSetPath = wordSetPath;
+        this.wordQueue = []
+    }
+    fillWordQueue(arraySize) {
+        this.wordQueue = this._getRandomWordQueue(arraySize);
+        return this.wordQueue;
+    }
+
+    _getRandomWordQueue(arraySize) {
+        const fs = window.electronAPI.fs;
+        let wordSetData;
+        try {
+            wordSetData = fs.readFileSync(this.wordSetPath, 'utf-8');
+        } catch (error) {
+            console.error('Error reading the file:', error);
+            return [];
+        }
+        const words = wordSetData.split(',');
+        const actualArraySize = Math.min(arraySize, words.length);
+        const shuffledWords = this._shuffleArray(words);
+
+        return shuffledWords.slice(0, actualArraySize);
+    }
+
+    _shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+}
 
 class GameManager {
     constructor(gameElements) {
@@ -305,6 +340,7 @@ class GameManager {
         this.hintManager = new HintManager(gameElements.hintText); 
         this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
+        this.wordQueueManager = new WordQueueManager(gameElements.wordSetPath);
 
         this.wordList = [];
         this.wordData = [];
@@ -318,7 +354,8 @@ class GameManager {
         this.allWordsSeen = false;
     }
     
-    async setupGame(wordList) {
+    async setupGame(numWords) {
+        const wordList = this.wordQueueManager.fillWordQueue(numWords);
         this.wordList = wordList.map((w) => {
             return {w: w, data: "original"};
         });
@@ -443,7 +480,9 @@ window.addEventListener('DOMContentLoaded', () => {
         scoreModal: document.getElementById('scoreModalWrapper'),
         scoreText: document.getElementById('scoreText'),
         scoreGrade: document.getElementById('scoreGrade'),
-        circleContainer: document.getElementById('circleContainer')
+        circleContainer: document.getElementById('circleContainer'),
+        // should change wordSetPath the directory of the word sets and add functionality to select a word set
+        wordSetPath: "./public/word-sets/foods.csv",
     }
 
     const game = new GameManager(gameElements);
@@ -454,5 +493,5 @@ window.addEventListener('DOMContentLoaded', () => {
     scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
     quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
 
-    game.setupGame(["barnacle", "python", "alabaster", "gneiss", "basin", "sediment", "shale", "metamorphic"]);
+    game.setupGame(10);
 });
