@@ -478,10 +478,61 @@ class GameManager {
 }
 
 
-window.addEventListener('DOMContentLoaded', () => {
-    const replayButton = document.getElementById('replayButton');
-    const quitButton = document.getElementById('quitButton');
-    const scoreModalButton = document.getElementById('scoreModalButton');
+window.addEventListener('DOMContentLoaded', async () => {
+    // GAME SETTINGS
+    let numWords = 5; 
+
+    // Event listeners for keyboard navigation of the game settings
+    const radioButtons = document.querySelectorAll('input[name="numWords"]');
+    function handleKeyPress(event) {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            const currentIndex = Array.from(radioButtons).findIndex(button => button.checked);
+            const offset = (event.key === 'ArrowRight') ? 1 : -1;
+            const nextIndex = (currentIndex + offset + radioButtons.length) % radioButtons.length;
+            radioButtons[nextIndex].checked = true;
+        }
+    }
+    document.addEventListener('keydown', handleKeyPress);
+    document.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            document.getElementById('continueButton').click();
+        }
+    });
+    // Event listeners for going back to main menu
+    const switchToMenu = () => {
+        window.electronAPI.switchPage("MENU");
+    };
+    const settingsQuitButton = document.getElementById('settingsQuitButton');
+    settingsQuitButton.addEventListener('click', switchToMenu);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' || event.code === 'Escape') {
+            switchToMenu();
+        }
+    });
+
+    // Create a promise that will be resolved when the continueButton is clicked
+    const continuePromise = new Promise(resolve => {
+        const continueButton = document.getElementById('continueButton');
+        continueButton.addEventListener('click', function () {
+            const radioButtons = document.getElementsByName("numWords");
+            for (const radioButton of radioButtons) {
+                if (radioButton.checked) {
+                    numWords = parseInt(radioButton.value);
+                    break;
+                }
+            }
+            document.getElementById('gameSettings').style.display = 'none';
+            document.getElementById('circleContainer').classList.remove('hidden');
+            document.getElementById('topDisplayWrapper').classList.remove('hidden');
+            document.getElementsByClassName('typezone')[0].classList.remove('hidden');
+
+            // Remove the keyboard event listener
+            document.removeEventListener('keydown', handleKeyPress);
+            resolve();
+        });
+    });
+    // Wait for the promise to be resolved before continuing
+    await continuePromise;
 
     const gameElements = {
         hintText: document.getElementById('hintText'),
@@ -495,14 +546,17 @@ window.addEventListener('DOMContentLoaded', () => {
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordSetPath: "./public/word-sets/foods.csv",
     }
-
     const game = new GameManager(gameElements);
+
+    const replayButton = document.getElementById('replayButton');
+    const quitButton = document.getElementById('quitButton');
+    const scoreModalButton = document.getElementById('scoreModalButton');
 
     replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); 
     replayButton.blur()});
     document.addEventListener("keydown", game.onTypeLetter);
-    scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
-    quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
+    scoreModalButton.addEventListener('click', switchToMenu);
+    quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(30);
+    game.setupGame(numWords);
 });

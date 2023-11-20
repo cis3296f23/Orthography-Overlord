@@ -4,11 +4,39 @@
     <meta charset="UTF-8">
     <title>Orthography Overlord</title>
     <link rel="stylesheet" href="./public/style/main.css">
+    <link rel="stylesheet" href="./public/style/gameSettings.css">
     <script src="./public/logic/gameLogic.js"></script>
   </head>
   <body>
     <audio id="primaryAudio" src="./public/sounds/comedy_sound.wav"></audio>
     <audio id="answerSound"></audio>
+
+    <div id="gameSettings">
+      <h2>Game Options</h2>
+      <label for="numWords">Number of Words:</label>
+      
+      <input type="radio" id="numWords5" name="numWords" value="5" checked>
+      <label for="numWords5">5</label>
+    
+      <input type="radio" id="numWords10" name="numWords" value="10">
+      <label for="numWords10">10</label>
+    
+      <input type="radio" id="numWords15" name="numWords" value="15">
+      <label for="numWords15">15</label>
+    
+      <input type="radio" id="numWords20" name="numWords" value="20">
+      <label for="numWords20">20</label>
+    
+      <input type="radio" id="numWords25" name="numWords" value="25">
+      <label for="numWords25">25</label>
+    
+      <input type="radio" id="numWords30" name="numWords" value="30">
+      <label for="numWords30">30</label>
+    
+      <button tabindex="-1" id="continueButton">Continue</button>
+      <button tabindex="-1" id="settingsQuitButton">Exit Game</button>
+    </div>
+
 
     <div class="hidden" id="scoreModalWrapper">
       <div id="scoreModal">
@@ -28,10 +56,10 @@
 
     <div id="circleWrapper">
       <!-- TODO: Add text that says "X words remaining" if we can't display the full set -->
-      <div id="circleContainer">   </div>
+      <div class = "hidden" id="circleContainer">   </div>
     </div>
 
-    <div id="topDisplayWrapper">
+    <div class="hidden" id="topDisplayWrapper">
         <div id="topDisplayContent"> 
             <button tabindex="-1" id="quitButton">Exit Game</button>
             <button tabindex="-1" id="replayButton">Replay Word</button>
@@ -39,7 +67,7 @@
         </div>
     </div>
 
-    <div class="typezone">
+    <div class="typezone hidden">
         <div id="inputContainer" class="letters">
         </div>
     </div>
