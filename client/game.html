@@ -17,20 +17,19 @@
         <div id="scoreModalContent">
           <img id="scoreCrown" src="./public/images/crown.png"> 
           <h2> Great Job! </h2>
-          <!-- Time Attack: Score = Time Spent-->
-          <!-- 2.5 expected guesses per word? Excellent or Great or Good -->
-          <!-- Normal Play: Score = % Correct -->
-          <!-- Revenge Factor: # Of Previously Mispelled, Now Corrected -->
           <div id="scoreBorder">
             <p> YOUR SCORE </p>
-            <h1 id="scoreText"> You got 1/20 words correct. </h1>
+            <h1 id="scoreText"> 0% </h1>
           </div>
           <button id="scoreModalButton">Back to Menu</button>
         </div>
       </div>
     </div>
 
-    <div id="circleContainer">   </div>
+    <div id="circleWrapper">
+      <!-- TODO: Add text that says "X words remaining" if we can't display the full set -->
+      <div id="circleContainer">   </div>
+    </div>
 
     <div id="topDisplayWrapper">
         <div id="topDisplayContent"> 
