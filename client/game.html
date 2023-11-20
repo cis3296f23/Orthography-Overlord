@@ -32,6 +32,12 @@
     
       <input type="radio" id="numWords30" name="numWords" value="30">
       <label for="numWords30">30</label>
+
+
+      <select name="wordset" id="wordsetSelector">
+        <!-- <option value="foods">Food</option> -->
+      </select>
+
     
       <button tabindex="-1" id="continueButton">Continue</button>
       <button tabindex="-1" id="settingsQuitButton">Exit Game</button>
@@ -60,6 +66,8 @@
     </div>
 
     <div class="hidden" id="topDisplayWrapper">
+        <h1 id="loadingBlurb"> Loading Words... One Moment! </h1>
+        
         <div id="topDisplayContent"> 
             <button tabindex="-1" id="quitButton">Exit Game</button>
             <button tabindex="-1" id="replayButton">Replay Word</button>

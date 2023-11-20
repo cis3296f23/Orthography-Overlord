@@ -61,15 +61,15 @@ async function retrieveAudioFileForWord(event, word) {
 
   try {
     const res = await axios.get(url);
+    console.log(res.data[0].hwi.prs[0]);
     const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${word[0]}/${res.data[0].hwi.prs[0].sound.audio}.mp3`;
     const audioStream = await axios.get(audioUrl, {
       responseType: 'stream',
     });
-
     await audioStream.data.pipe(fs.createWriteStream(filename));
     event.reply("dictionary-data-response", filename);
   } catch(err) {
-    console.log(err);
+    console.error(err);
     event.reply("dictionary-error-response", JSON.stringify(err));
   }
 }
