@@ -1,13 +1,13 @@
 const fs = window.electronAPI.fs;
+
 class CircleManager {
     constructor(_circleContainer, _gameManager) {
         this.circleContainer = _circleContainer
         this.gameManager = _gameManager
-        this.maxCircles = 30;
-        this.offsetAmount = 5;
+        this.maxCircles = 40;
+        this.offsetAmount = 1;
         this.offset = 0;
         this.circleList = [];
-        this.lastWordDataLength = -1
     }
 
     makeMark(succeed, retry) {
@@ -26,66 +26,74 @@ class CircleManager {
         return mark;
     }
 
-    displayCircles() {
-        if(this.lastWordDataLength == Object.keys(this.gameManager.wordData).length) {
-            if(!this.gameManager.allWordsSeen) {
-                return;
-            }
-        } else {
-            this.lastWordDataLength = Object.keys(this.gameManager.wordData).length;
-        }
-
+    initializeCircles() {
         this.circleList = [];
         this.circleContainer.innerHTML = "";
 
-        if(this.gameManager.currentWordIndex+1 > this.maxCircles + this.offset) {
-            this.offset += this.offsetAmount;
+        for(var x=0; x<Math.min(this.gameManager.wordList.length - this.offset, this.maxCircles); x++) {
+            this.addCircle();
+        }
+    }
+
+    displayCircles() {
+        if(this.circleList.length == 0) {
+            this.initializeCircles();
         }
 
-        var firstUncompleted = -1;
-        for(var x=this.offset; x<this.maxCircles + this.offset; x++) {
-            
-            if(x >= this.gameManager.wordList.length) {
-                continue;
+        const lookAheadIndex = this.gameManager.currentWordIndex + this.offsetAmount;
+
+        if(this.gameManager.currentWordIndex < this.offset) {
+            if(this.gameManager.currentWordIndex == 0) {
+                this.offset = 0;
+            } else {
+                this.offset = this.gameManager.currentWordIndex -1;
             }
 
-            const retry = this.gameManager.wordList[x].data == "retry" || this.gameManager.wordList[x].data == "redeemed";
-            const seen = this.gameManager.wordData[x] != undefined;
+            this.initializeCircles();
+        } else if(lookAheadIndex > this.offset+this.maxCircles) {
+            if(this.gameManager.currentWordIndex > this.offset+this.offsetAmount) {
+                this.offset = this.gameManager.currentWordIndex-1;
+            } else {
+                this.offset += this.offsetAmount;
+            }
+
+            this.initializeCircles();
+        }
+
+        var subset = this.gameManager.wordList.slice(this.offset, this.offset+this.maxCircles);
+        var currentIndexInSubset = this.gameManager.currentWordIndex - this.offset;
+
+        for(var word of subset) {
+            const redeemable = word.displayAsRedeemedWord;
+            const seen = word.seen;
+            const success = word.firstTried;
             
+            const circle = this.circleList[subset.indexOf(word)];
+            if(circle.classList.contains("animating")) {
+                circle.classList = "";
+                circle.classList.add("animating");
+            } else {
+                circle.classList = "";
+            }
 
-            var circle = this.addCircle();
+            circle.innerHTML = "";
 
-            if(retry) { circle.classList.add("retry"); }
+            if(redeemable) { circle.classList.add("retry"); }
             
             if(seen) {
-                var success = this.gameManager.wordData[x];
                 circle.classList.add(success ? "complete" : "failed")
-                var mark = this.makeMark(success, retry);
+                var mark = this.makeMark(success, redeemable);
                 circle.appendChild(mark);
-            } else if(firstUncompleted == -1) {
-                firstUncompleted = (x - this.offset);
             }
         }
         
-        if(this.gameManager.allWordsSeen) {
-            for(var x=this.offset; x<this.maxCircles + this.offset; x++) {
-                const retry = this.gameManager.wordList[x].data == "retry" 
-                if(retry) {
-                    firstUncompleted = x;
-                    break;
-                }
-            }
-        }
-        
-        if(firstUncompleted != -1) {
-            this.circleList[firstUncompleted].classList.add("current");
-        
-            if(this.gameManager.currentWordIndex != 0 && !this.gameManager.allWordsSeen) {
-                this.circleList[firstUncompleted-1].classList.add("animating")
-            } else if(this.gameManager.allWordsSeen) {
-                this.circleList[firstUncompleted].classList.add("animating");
-            }
-        }
+        this.circleList[currentIndexInSubset].classList.add("current");
+    }
+
+    flashCurrentCircle() {
+        var currentIndexInSubset = this.gameManager.currentWordIndex - this.offset;
+        console.log(currentIndexInSubset);
+        this.circleList[currentIndexInSubset].classList.add("animating");
     }
 
     addDummy() {
@@ -180,13 +188,15 @@ class AudioManager {
     loadAudio = async (word) => { return window.electronAPI.loadAudioForWord(word) }
 
     async loadAudioForCurrentGame(wordList) {
-        for(var word of wordList) {
+        for(var w of wordList) {
             try {
-                var filename = await this.loadAudio(word);
+                console.log(w);
+                var filename = await this.loadAudio(w);
+                console.log(filename);
             } catch(e) {
                 console.error("Could not load a file.", e);
             }
-            this.loadedAudio[word] = filename;
+            this.loadedAudio[w] = filename;
         }
     }
 
@@ -343,63 +353,68 @@ class GameManager {
         this.wordQueueManager = new WordQueueManager(gameElements.wordSetPath);
 
         this.wordList = [];
-        this.wordData = [];
-
-        this.startingWordCount = 0;
 
         this.wordAddedToBack = false;
         this.currentWordIndex = 0;
 
-        this.gameActive = false;
-        this.allWordsSeen = false;
+        this.gameActive = true;
+        this.inRetryStage = false;
     }
     
     async setupGame(numWords) {
         const wordList = this.wordQueueManager.fillWordQueue(numWords);
+
         this.wordList = wordList.map((w) => {
-            return {w: w, data: "original"};
+            return {
+                word: w, 
+                needsRetry: false, 
+                displayAsRedeemedWord: false,
+                firstTried: false, 
+                seen: false
+            };
         });
-        this.startingWordCount = wordList.length;
+
         await this.audioManager.loadAudioForCurrentGame(wordList);
+
         this.currentWordIndex = 0;
         this.circleManager.displayCircles();
         this.loadWord();
     }
 
+    fillRetryableWordList() {
+        this.retryWords = this.wordList.filter((word) => { return word.needsRetry; });
+        for(var word of this.wordList) {
+            word.needsRetry = false;
+        }
+    }
+
     nextWord() {
         this.gameActive = false;
-        // loadword sets gameactive to true
-        this.audioManager.playAnswerSound(true);
-        if(this.currentWordIndex < this.wordList.length-1 && !this.allWordsSeen) {
+        this.circleManager.flashCurrentCircle();
+
+        if(!this.inRetryStage && this.currentWordIndex >= this.wordList.length-1) {
+            this.inRetryStage = true;
+            this.fillRetryableWordList();
+        }
+
+        if(!this.inRetryStage) {
             this.currentWordIndex++;
-            setTimeout(() => {
-                this.loadWord();
-            }, 800);
+            setTimeout(() => { this.loadWord(); this.gameActive = true; }, 800);
         } else {
-            // if 
-            this.allWordsSeen = true;
 
-            var retryWords = this.wordList.filter((word) => {
-                return word.data == "retry";
-            }).sort((a, b) => {
-                return b.index - a.index;
-            })
+            if(this.retryWords.length == 0) {
+                // done with this list. can we get more?
+                this.fillRetryableWordList();
+            }
 
+            var retryable = this.retryWords.shift() || -1;
+            console.log(retryable);
 
-
-            if(retryWords.length > 0) {
-                var retryable = retryWords.pop();
-                if(retryable.index == this.lastIndex && retryWords.length > 1) {
-                    retryable = retryWords.pop();
-                }
-                this.currentWordIndex = retryable.index;
-                this.lastIndex = retryable.index;
-                
-                setTimeout(() => {
-                    this.loadWord();
-                }, 800);
-            } else {
+            if(retryable == -1) {
                 this.completeGame();
+            } else {
+                this.currentWordIndex = this.wordList.indexOf(retryable);
+                setTimeout(() => { this.loadWord(); this.gameActive = true;}, 800);
             }
         }
 
@@ -408,10 +423,11 @@ class GameManager {
     }
     
     loadWord() {
-        this.audioManager.setAudioForWord(this.wordList[this.currentWordIndex].w);
+        var currentWord = this.wordList[this.currentWordIndex];
+        this.audioManager.setAudioForWord(currentWord.word);
+        currentWord.seen = true;
         this.inputManager.clearInput();
         this.wordAddedToBack = false;
-        this.gameActive = true;
     }
 
     onTypeLetter = (e) => {
@@ -429,40 +445,35 @@ class GameManager {
     }
 
     checkCorrectWord() {
-        if(this.inputManager.getEnteredLetters() == this.wordList[this.currentWordIndex].w) {
+        var currentWord = this.wordList[this.currentWordIndex];
+
+        // user guessed successfully
+        if(this.inputManager.getEnteredLetters() == currentWord.word) {
+            this.audioManager.playAnswerSound(true);
             this.hintManager.clearHint();
             this.inputManager.flashGood();
-            if(!this.wordAddedToBack) {
-                this.wordData[this.currentWordIndex] = true;
-            }
 
-            if(this.wordList[this.currentWordIndex].data == "retry" && this.allWordsSeen && !this.wordAddedToBack) {
-                this.wordData[this.currentWordIndex] = true;
-                this.wordList[this.currentWordIndex].data = "redeemed"; 
+            // did the user guess first try?
+            if(!currentWord.needsRetry) {
+                currentWord.firstTried = true;
             }
 
             this.nextWord();
             return true;
         }
 
-        if(!this.wordAddedToBack) {
-            this.wordList[this.currentWordIndex].data = "retry";
-            this.wordList[this.currentWordIndex].index = this.currentWordIndex;
-            // var copyWord = {w: this.wordList[this.currentWordIndex].w, data: "retry"}
-            // this.wordList.push(copyWord);
-            this.wordAddedToBack = true;
-        }
-
-        this.wordData[this.currentWordIndex] = false;
+        // user failed.
+        currentWord.needsRetry = true;
+        currentWord.displayAsRedeemedWord = true;
         this.audioManager.playAnswerSound(false);
-        this.hintManager.displayHint(this.wordList[this.currentWordIndex].w, this.inputManager.getEnteredLetters());
+        this.hintManager.displayHint(currentWord.word, this.inputManager.getEnteredLetters());
         this.inputManager.clearInput();
 
         return false;
     }
 
     completeGame() {
-        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.startingWordCount)
+        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length)
     }
 }
 
