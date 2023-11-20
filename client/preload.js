@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron')
+const fs = require('fs');
 
 const PAGES = {
     "MENU": "menu.html",
@@ -37,5 +38,6 @@ async function loadAudioForWord(word) {
 contextBridge.exposeInMainWorld('electronAPI', {
     switchPage: switchPage,
     loadAudioForWord: loadAudioForWord,
+    fs: fs,
 })
 

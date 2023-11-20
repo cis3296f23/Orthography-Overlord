@@ -1,3 +1,4 @@
+const fs = window.electronAPI.fs;
 class CircleManager {
     constructor(_circleContainer, _gameManager) {
         this.circleContainer = _circleContainer
@@ -297,6 +298,40 @@ class ScoreManager {
     }
     
 }
+class WordQueueManager {
+    constructor(wordSetPath) {
+        this.wordSetPath = wordSetPath;
+        this.wordQueue = []
+    }
+    fillWordQueue(arraySize) {
+        this.wordQueue = this._getRandomWordQueue(arraySize);
+        return this.wordQueue;
+    }
+
+    _getRandomWordQueue(arraySize) {
+        const fs = window.electronAPI.fs;
+        let wordSetData;
+        try {
+            wordSetData = fs.readFileSync(this.wordSetPath, 'utf-8');
+        } catch (error) {
+            console.error('Error reading the file:', error);
+            return [];
+        }
+        const words = wordSetData.split(',');
+        const actualArraySize = Math.min(arraySize, words.length);
+        const shuffledWords = this._shuffleArray(words);
+
+        return shuffledWords.slice(0, actualArraySize);
+    }
+
+    _shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+}
 
 class GameManager {
     constructor(gameElements) {
@@ -305,6 +340,7 @@ class GameManager {
         this.hintManager = new HintManager(gameElements.hintText); 
         this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
+        this.wordQueueManager = new WordQueueManager(gameElements.wordSetPath);
 
         this.wordList = [];
         this.wordData = [];
@@ -318,7 +354,8 @@ class GameManager {
         this.allWordsSeen = false;
     }
     
-    async setupGame(wordList) {
+    async setupGame(numWords) {
+        const wordList = this.wordQueueManager.fillWordQueue(numWords);
         this.wordList = wordList.map((w) => {
             return {w: w, data: "original"};
         });
@@ -430,10 +467,61 @@ class GameManager {
 }
 
 
-window.addEventListener('DOMContentLoaded', () => {
-    const replayButton = document.getElementById('replayButton');
-    const quitButton = document.getElementById('quitButton');
-    const scoreModalButton = document.getElementById('scoreModalButton');
+window.addEventListener('DOMContentLoaded', async () => {
+    // GAME SETTINGS
+    let numWords = 5; 
+
+    // Event listeners for keyboard navigation of the game settings
+    const radioButtons = document.querySelectorAll('input[name="numWords"]');
+    function handleKeyPress(event) {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            const currentIndex = Array.from(radioButtons).findIndex(button => button.checked);
+            const offset = (event.key === 'ArrowRight') ? 1 : -1;
+            const nextIndex = (currentIndex + offset + radioButtons.length) % radioButtons.length;
+            radioButtons[nextIndex].checked = true;
+        }
+    }
+    document.addEventListener('keydown', handleKeyPress);
+    document.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            document.getElementById('continueButton').click();
+        }
+    });
+    // Event listeners for going back to main menu
+    const switchToMenu = () => {
+        window.electronAPI.switchPage("MENU");
+    };
+    const settingsQuitButton = document.getElementById('settingsQuitButton');
+    settingsQuitButton.addEventListener('click', switchToMenu);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' || event.code === 'Escape') {
+            switchToMenu();
+        }
+    });
+
+    // Create a promise that will be resolved when the continueButton is clicked
+    const continuePromise = new Promise(resolve => {
+        const continueButton = document.getElementById('continueButton');
+        continueButton.addEventListener('click', function () {
+            const radioButtons = document.getElementsByName("numWords");
+            for (const radioButton of radioButtons) {
+                if (radioButton.checked) {
+                    numWords = parseInt(radioButton.value);
+                    break;
+                }
+            }
+            document.getElementById('gameSettings').style.display = 'none';
+            document.getElementById('circleContainer').classList.remove('hidden');
+            document.getElementById('topDisplayWrapper').classList.remove('hidden');
+            document.getElementsByClassName('typezone')[0].classList.remove('hidden');
+
+            // Remove the keyboard event listener
+            document.removeEventListener('keydown', handleKeyPress);
+            resolve();
+        });
+    });
+    // Wait for the promise to be resolved before continuing
+    await continuePromise;
 
     const gameElements = {
         hintText: document.getElementById('hintText'),
@@ -443,16 +531,21 @@ window.addEventListener('DOMContentLoaded', () => {
         scoreModal: document.getElementById('scoreModalWrapper'),
         scoreText: document.getElementById('scoreText'),
         scoreGrade: document.getElementById('scoreGrade'),
-        circleContainer: document.getElementById('circleContainer')
+        circleContainer: document.getElementById('circleContainer'),
+        // should change wordSetPath the directory of the word sets and add functionality to select a word set
+        wordSetPath: "./public/word-sets/foods.csv",
     }
-
     const game = new GameManager(gameElements);
+
+    const replayButton = document.getElementById('replayButton');
+    const quitButton = document.getElementById('quitButton');
+    const scoreModalButton = document.getElementById('scoreModalButton');
 
     replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); 
     replayButton.blur()});
     document.addEventListener("keydown", game.onTypeLetter);
-    scoreModalButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
-    quitButton.addEventListener('click', () => { window.electronAPI.switchPage("MENU") });
+    scoreModalButton.addEventListener('click', switchToMenu);
+    quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(["barnacle", "python", "alabaster", "gneiss", "basin", "sediment", "shale", "metamorphic"]);
+    game.setupGame(numWords);
 });
