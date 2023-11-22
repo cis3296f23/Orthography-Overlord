@@ -45,9 +45,13 @@
         <div id="scoreModalContent">
           <img id="scoreCrown" src="./public/images/crown.png"> 
           <h2> Great Job! </h2>
-          <div id="scoreBorder">
+          <div class="scores" id="scoreBorder">
             <p> YOUR SCORE </p>
             <h1 id="scoreText"> 0% </h1>
+          </div>
+          <div class="scores" id="timerBorder">
+            <p> YOUR TIME </p>
+            <h1 id="timerText"> 00:00.00 </h1>
           </div>
           <button id="scoreModalButton">Back to Menu</button>
         </div>
@@ -65,6 +69,10 @@
             <button tabindex="-1" id="replayButton">Replay Word</button>
             <h1 id="hintText"></h1>
         </div>
+    </div>
+
+    <div class="hidden" id="timerWrapper">
+      <div id="timerDisplay">00:00.00</div>
     </div>
 
     <div class="typezone hidden">
