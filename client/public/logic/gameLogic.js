@@ -524,6 +524,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('gameSettings').style.display = 'none';
             document.getElementById('circleContainer').classList.remove('hidden');
             document.getElementById('topDisplayWrapper').classList.remove('hidden');
+            document.getElementById('timerWrapper').classList.remove('hidden');
             document.getElementsByClassName('typezone')[0].classList.remove('hidden');
 
             // Remove the keyboard event listener
