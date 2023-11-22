@@ -261,14 +261,15 @@ class HintManager {
 
 class ScoreManager {
 
-    constructor(_scoreModal, _scoreDisplay, _scoreGrade) {
+    constructor(_scoreModal, _scoreDisplay, _scoreGrade, _finalTime) {
         this.scoreModal = _scoreModal;
         this.scoreDisplay = _scoreDisplay;
         this.scoreGrade = _scoreGrade;
+        this.finalTime = _finalTime;
         this.score = 100;
     }
     
-    calculateAndDisplayScore(hintHistory, wordCount) {
+    calculateAndDisplayScore(hintHistory, wordCount, finishTimeString) {
         var perWordScore = 100 / wordCount;
 
         for(var hints of hintHistory) {
@@ -305,6 +306,7 @@ class ScoreManager {
         this.scoreModal.classList.toggle("hidden");
         this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
         this.scoreGrade.innerHTML = `${grade}`
+        this.finalTime.innerHTML = finishTimeString;
     }
     
 }
@@ -343,14 +345,58 @@ class WordQueueManager {
     }
 }
 
+class timerManager {
+    constructor(timerDisplay) {
+        this.startTime = 0;
+        this.isRunning = false;
+        this.interval_id = null;
+        this.timerDisplay = timerDisplay;
+    }
+    
+    startTimer() {
+        if (!this.isRunning) {
+        this.startTime = Date.now() - (this.elapsedTime || 0);
+        this.isRunning = true;
+    
+        this.interval_id = setInterval(() => {
+            this._updateDisplay();
+        }, 50); // update display every 50 ms (20 fps)
+        }
+    }
+    
+    stopTimer() {
+        if (this.isRunning) {
+            clearInterval(this.interval_id);
+            this.elapsedTime = Date.now() - this.startTime;
+            this.isRunning = false;
+        }
+        return this.timerDisplay.textContent;
+    }
+    
+    _updateDisplay() {
+        const elapsedTime = Date.now() - this.startTime;
+        const minutes = Math.floor(elapsedTime / (60 * 1000));
+        const seconds = Math.floor((elapsedTime % (60 * 1000)) / 1000);
+        const centiseconds = Math.floor((elapsedTime % 1000) / 10);
+    
+        const displayString = `${this._formatTimeComponent(minutes)}:${this._formatTimeComponent(seconds)}.${this._formatTimeComponent(centiseconds)}`;
+        this.timerDisplay.textContent = displayString;
+    }
+    
+    _formatTimeComponent(value) {
+        return value < 10 ? `0${value}` : value;
+    }
+}
+
 class GameManager {
     constructor(gameElements) {
         this.inputManager = new InputManager(gameElements.inputContainer);
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
         this.hintManager = new HintManager(gameElements.hintText); 
-        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade);
+        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
         this.wordQueueManager = new WordQueueManager(gameElements.wordSetPath);
+        this.timerManager = new timerManager(gameElements.timerDisplay);
 
         this.wordList = [];
 
@@ -379,6 +425,7 @@ class GameManager {
         this.currentWordIndex = 0;
         this.circleManager.displayCircles();
         this.loadWord();
+        this.timerManager.startTimer();
     }
 
     fillRetryableWordList() {
@@ -473,7 +520,8 @@ class GameManager {
     }
 
     completeGame() {
-        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length)
+        const finalTime = this.timerManager.stopTimer();
+        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime);
     }
 }
 
@@ -544,6 +592,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         scoreText: document.getElementById('scoreText'),
         scoreGrade: document.getElementById('scoreGrade'),
         circleContainer: document.getElementById('circleContainer'),
+        timerDisplay: document.getElementById('timerDisplay'),
+        finalTime: document.getElementById('timerText'),
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordSetPath: "./public/word-sets/foods.csv",
     }

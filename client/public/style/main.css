@@ -202,9 +202,9 @@ body {
 
 #scoreModal {
     position: relative;
-    margin-top: 170px;
+    margin-top: 100px;
     width: 400px;
-    height: 300px;
+    height: 400px;
     border: 5px #e69d02 solid;
     border-radius: 30px;
     background-color: #1B4965;
@@ -218,23 +218,27 @@ body {
     text-align: center;
 }
 
-#scoreBorder {
+.scores {
     background-color: #0D2331;
     border-radius: 50px;
     border: 5px solid #e69d02;
 }
 
-#scoreBorder p {
+.scores p {
     margin: 0px;
     padding: 0px;
     margin-top: 10px;
 }
 
-#scoreBorder h1 {
+.scores h1 {
     margin: 0px;
     padding: 0px;
     margin-bottom: 10px;
     font-size: 25pt;
+}
+
+#timerBorder {
+    margin-top: 10px
 }
 
 #scoreModalContent * {
