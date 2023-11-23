@@ -8,6 +8,14 @@ body {
     overflow: hidden;
 }
 
+#timerDisplay {
+    position: absolute;
+    font-size: 2em;
+    margin-top: -250px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 #circleContainer {
     width: 60%;
     margin: 0 auto;
@@ -129,7 +137,7 @@ body {
     margin-bottom: 20px;
 }
 /* Buttons */
-#replayButton, #scoreModalButton {
+#replayButton {
     background-color: #057108;
     bottom: 20%;
     left: 40%;
@@ -142,7 +150,7 @@ body {
     outline: none;
 }
   
-#replayButton:hover, #scoreModalButton:hover {
+#replayButton:hover {
     background-color: #003002;
 }
 /* Button for returning to main menu */
@@ -178,80 +186,6 @@ body {
 
 .hidden {
     display: none !important;
-}
-
-#scoreModalWrapper {
-    top: 0px;
-    animation: appear 0.5s ease-in-out;
-    z-index: 10;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.3)
-}
-
-#scoreModal {
-    position: relative;
-    margin-top: 170px;
-    width: 400px;
-    height: 300px;
-    border: 5px #e69d02 solid;
-    border-radius: 30px;
-    background-color: #1B4965;
-}
-
-#scoreModalContent {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 30px;
-    text-align: center;
-}
-
-#scoreBorder {
-    background-color: #0D2331;
-    border-radius: 50px;
-    border: 5px solid #e69d02;
-}
-
-#scoreBorder p {
-    margin: 0px;
-    padding: 0px;
-    margin-top: 10px;
-}
-
-#scoreBorder h1 {
-    margin: 0px;
-    padding: 0px;
-    margin-bottom: 10px;
-    font-size: 25pt;
-}
-
-#scoreModalContent * {
-    width: 100%;
-}
-
-#scoreCrown {
-    margin-right: 30px;
-    top: -90px;
-    width: 140px;
-    height: auto;
-    position: absolute;
-}
-
-#scoreGrade {
-    position: absolute;
-    right: -30px;
-    top: -80px;
-    text-shadow: 5px 5px black;
-    font-size: 50pt;
-    transform: rotateZ(10deg);
-}
-
-#scoreModalButton {
-    margin-top: 30px;
 }
 
 @keyframes appear {

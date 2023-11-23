@@ -5,6 +5,7 @@
     <title>Orthography Overlord</title>
     <link rel="stylesheet" href="./public/style/main.css">
     <link rel="stylesheet" href="./public/style/gameSettings.css">
+    <link rel="stylesheet" href="./public/style/scoreBoard.css">
     <script src="./public/logic/gameLogic.js"></script>
   </head>
   <body>
@@ -39,23 +40,50 @@
       </select>
 
     
+      <div id="timedOption">
+        <label for="timedMode">Timed Mode:</label>
+        
+        <input type="radio" id="timedModeOn" name="timedMode" value="on" checked tabindex="-1">
+        <label for="timedModeOn">On</label>
+      
+        <input type="radio" id="timedModeOff" name="timedMode" value="off" tabindex="-1">
+        <label for="timedModeOff">Off</label>
+      </div>
+
       <button tabindex="-1" id="continueButton">Continue</button>
       <button tabindex="-1" id="settingsQuitButton">Exit Game</button>
     </div> 
 
 
     <div class="hidden" id="scoreModalWrapper">
-      <div id="scoreModal">
+      <div id="scoreAndTimerModal">
+        <h1 id="scoreAndTimerGrade"> A+ </h1>
+
+        <div id="scoreModalContent">
+          <img id="scoreCrown" src="./public/images/crown.png"> 
+          <h2> Great Job! </h2>
+          <div class="scores" id="scoreBorder">
+            <p> YOUR SCORE </p>
+            <h1 id="scoreAndTimerText"> 0% </h1>
+          </div>
+          <div class="scores" id="timerBorder">
+            <p> YOUR TIME </p>
+            <h1 id="timerText"> 00:00.00 </h1>
+          </div>
+          <button id="scoreModalButton">Back to Menu</button>
+        </div>
+      </div>
+      <div class="hidden" id="scoreModal">
         <h1 id="scoreGrade"> A+ </h1>
 
         <div id="scoreModalContent">
           <img id="scoreCrown" src="./public/images/crown.png"> 
           <h2> Great Job! </h2>
-          <div id="scoreBorder">
+          <div class="scores" id="scoreBorder">
             <p> YOUR SCORE </p>
             <h1 id="scoreText"> 0% </h1>
           </div>
-          <button id="scoreModalButton">Back to Menu</button>
+          <button id="scoreAndTimerModalButton">Back to Menu</button>
         </div>
       </div>
     </div>
@@ -73,6 +101,10 @@
             <button tabindex="-1" id="replayButton">Replay Word</button>
             <h1 id="hintText"></h1>
         </div>
+    </div>
+
+    <div class="hidden" id="timerWrapper">
+      <div id="timerDisplay">00:00.00</div>
     </div>
 
     <div class="typezone hidden">
