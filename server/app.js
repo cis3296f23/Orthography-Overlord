@@ -4,17 +4,16 @@ const http = require('http');
 const fs = require('fs');
 // Temporary for faking Bridge
 
-module.exports = class FeatureServer {
+class FeatureServer {
 	
 	constructor() {
-		// Store fake config files to serve. Temporary for faking Bridge
-		this.nodes_schema = json.readFileSync(`${__dirname}/../fake_configs/service_nodes.json`);
-
 		this.insecure_server_opts = {
 			name: "insecure_server",
 			port: 3050,
 			set_routes: this.set_insecure_routes.bind(this),
 		}
+
+        this.start_server(this.insecure_server_opts);
 	}
 
 	start_server(server_opts) {
