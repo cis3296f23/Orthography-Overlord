@@ -10,26 +10,6 @@
     background-color: rgba(0, 0, 0, 0.3)
 }
 
-#scoreModal {
-    position: relative;
-    margin-top: 170px;
-    width: 400px;
-    height: 300px;
-    border: 5px #e69d02 solid;
-    border-radius: 30px;
-    background-color: #1B4965;
-}
-
-#scoreAndTimerModal {
-    position: relative;
-    margin-top: 100px;
-    width: 400px;
-    height: 400px;
-    border: 5px #e69d02 solid;
-    border-radius: 30px;
-    background-color: #1B4965;
-}
-
 #scoreModalContent {
     display: flex;
     justify-content: center;
@@ -129,4 +109,53 @@
 
 #timerBorder {
     margin-top: 10px
+}
+
+#scoreAndTimerModal,
+#scoreModal {
+  /* Initially hidden */
+  opacity: 0;
+  visibility: hidden;
+  /* Centered on the screen */
+  position: relative;
+  left: 200px; 
+  transform: translate(-50%, -50%) scale(0);
+  /* Add transition for smooth animation */
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  /* Add animation properties */
+  animation: modalAnimation 1.5s ease forwards;
+}
+
+#scoreModal {
+    margin-top: 170px;
+    width: 400px;
+    height: 300px;
+    border: 5px #e69d02 solid;
+    border-radius: 30px;
+    background-color: #1B4965;
+}
+
+#scoreAndTimerModal {
+    margin-top: 310px;
+    width: 400px;
+    height: 400px;
+    border: 5px #e69d02 solid;
+    border-radius: 30px;
+    background-color: #1B4965;
+}
+
+@keyframes modalAnimation {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+  }
+}
+
+#scoreAndTimerModal.show,
+#scoreModal.show {
+  /* Make it visible */
+  opacity: 1;
+  visibility: visible;
 }
