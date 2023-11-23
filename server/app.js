@@ -1,19 +1,16 @@
 const express = require('express')
 const http = require('http');
-
 const fs = require('fs');
 // Temporary for faking Bridge
 
 class FeatureServer {
 	
 	constructor() {
-		this.insecure_server_opts = {
+        this.start_server({
 			name: "insecure_server",
 			port: 3050,
 			set_routes: this.set_insecure_routes.bind(this),
-		}
-
-        this.start_server(this.insecure_server_opts);
+		});
 	}
 
 	start_server(server_opts) {
@@ -23,15 +20,15 @@ class FeatureServer {
 		server_opts.set_routes(app);
 
 
-        this.servers[server_opts.name] = http.createServer(app);
-		this.servers[server_opts.name].on('error', (e)=> {console.error(e)});
-		this.servers[server_opts.name].listen(server_opts.port, (e)=>{console.log(e)});
+        this.server = http.createServer(app);
+		this.server.on('error', (e)=> {console.error(e)});
+		this.server.listen(server_opts.port, ()=>{console.log("The server is running! Happy Spelling!")});
 	}
 
 	set_insecure_routes(app) {
-		app.get('/', (req, res) => {
-			res.send('Hello World!');
-		  })
+        app.get('/', (req, res) => {
+            res.send('Hello World!');
+        })
 	}
 }
 
