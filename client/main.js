@@ -4,6 +4,8 @@ const path = require('node:path')
 const axios = require('axios');
 const fs = require('fs');
 const userpath = app.getPath("userData");
+// const API_ADDRESS = "http://157.245.136.109:3050";
+const API_ADDRESS = "http://localhost:3050";
 
 // **************
 // ELECTRON SETUP
@@ -21,9 +23,6 @@ const createWindow = () => {
   })
 
   mainWindow.loadFile('menu.html')
-
-
-  // mainWindow.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
@@ -50,7 +49,8 @@ app.on('window-all-closed', () => {
 
 
 async function retrieveAudioFileForWord(event, word) {
-  const url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;
+  const url = `${API_ADDRESS}/audio/${word}`
+  // const url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;
   const filename = path.join(userpath, `${word}.mp3`);
 
   if(fs.existsSync(filename)) {
@@ -60,12 +60,7 @@ async function retrieveAudioFileForWord(event, word) {
   }
 
   try {
-    const res = await axios.get(url);
-    console.log(res.data[0].hwi.prs[0]);
-    const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${word[0]}/${res.data[0].hwi.prs[0].sound.audio}.mp3`;
-    const audioStream = await axios.get(audioUrl, {
-      responseType: 'stream',
-    });
+    const audioStream = await axios.get(url, { responseType: 'stream' });
     await audioStream.data.pipe(fs.createWriteStream(filename));
     event.reply("dictionary-data-response", filename);
   } catch(err) {
