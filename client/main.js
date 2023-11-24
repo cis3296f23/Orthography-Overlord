@@ -47,6 +47,14 @@ app.on('window-all-closed', () => {
 // ORTHOGRAPHY OVERLORD LOGIC
 // **************************
 
+function download(response, path) {
+  const writer = fs.createWriteStream(path)
+  response.data.pipe(writer);
+  return new Promise((resolve, reject) => {
+    writer.on('finish', resolve)
+    writer.on('error', reject)
+    })
+}
 
 async function retrieveAudioFileForWord(event, word) {
   const url = `${API_ADDRESS}/audio/${word}`
@@ -61,7 +69,8 @@ async function retrieveAudioFileForWord(event, word) {
 
   try {
     const audioStream = await axios.get(url, { responseType: 'stream' });
-    await audioStream.data.pipe(fs.createWriteStream(filename));
+    await download(audioStream, filename);
+    // await audioStream.data.pipe(fs.createWriteStream(filename));
     event.reply("dictionary-data-response", filename);
   } catch(err) {
     console.error(err);
