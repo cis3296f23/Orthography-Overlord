@@ -4,8 +4,8 @@ const path = require('node:path')
 const axios = require('axios');
 const fs = require('fs');
 const userpath = app.getPath("userData");
-// const API_ADDRESS = "http://157.245.136.109:3050";
-const API_ADDRESS = "http://localhost:3050";
+const API_ADDRESS = "http://157.245.136.109:3050";
+// const API_ADDRESS = "http://localhost:3050";
 
 // **************
 // ELECTRON SETUP
