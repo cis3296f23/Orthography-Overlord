@@ -123,11 +123,11 @@
   /* Add transition for smooth animation */
   transition: opacity 0.5s ease, visibility 0.5s ease;
   /* Add animation properties */
-  animation: modalAnimation 1.5s ease forwards;
+  animation: modalAnimation 1.5s ease forwards 0.5s;
 }
 
 #scoreModal {
-    margin-top: 170px;
+    margin-top: 290px;
     width: 400px;
     height: 300px;
     border: 5px #e69d02 solid;

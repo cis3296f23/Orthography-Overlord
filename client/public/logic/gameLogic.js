@@ -218,6 +218,14 @@ class AudioManager {
         }
         this.answerSound.play();
     }
+
+    playGameFinishSound() {
+        const gameFinishSound = document.getElementById('winGameSound');
+        setTimeout(function() {
+            gameFinishSound.volume = 0.7;
+            gameFinishSound.play();
+        }, 1000);
+    }
 }
 
 class HintManager {
@@ -539,6 +547,7 @@ class GameManager {
     completeGame() {
         const finalTime = (this.timerManager)? this.timerManager.stopTimer():0;
         this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime);
+        this.audioManager.playGameFinishSound();
     }
 }
 
