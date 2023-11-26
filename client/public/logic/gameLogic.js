@@ -222,6 +222,14 @@ class AudioManager {
         }
         this.answerSound.play();
     }
+
+    playGameFinishSound() {
+        const gameFinishSound = document.getElementById('winGameSound');
+        setTimeout(function() {
+            gameFinishSound.volume = 0.7;
+            gameFinishSound.play();
+        }, 1000);
+    }
 }
 
 class HintManager {
@@ -265,8 +273,9 @@ class HintManager {
 
 class ScoreManager {
 
-    constructor(_scoreModal, _scoreDisplay, _scoreGrade, _finalTime) {
+    constructor(_scoreModal,_scoreModalWrapper ,_scoreDisplay, _scoreGrade, _finalTime) {
         this.scoreModal = _scoreModal;
+        this.scoreModalWrapper = _scoreModalWrapper;
         this.scoreDisplay = _scoreDisplay;
         this.scoreGrade = _scoreGrade;
         this.finalTime = _finalTime;
@@ -294,25 +303,34 @@ class ScoreManager {
             }
         }
 
-        var grade = "D";
+        var grade = "F-";
         if(this.score == 100) {
             grade = "S+";
         } else if(this.score > 90) {
             grade = "A";
         } else if(this.score > 85) {
-            grade = "A-";
+            grade = "B+";
         } else if(this.score > 80) {
             grade = "B";
-        } else if(this.score > 70) {
-            grade = "C";
+        } else if(this.score > 75) {
+            grade = "C+";
+        } else if (this.score > 70) {
+            grade = "C"
+        } else if (this.score > 60) {
+            grade = "D+"
+        } else if (this.score > 50) {
+            grade = "D"
+        } else if (this.score >25) {
+            grade = "F"
         }
 
-        this.scoreModal.classList.toggle("hidden");
+        this.scoreModalWrapper.classList.toggle("hidden");
         this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
         this.scoreGrade.innerHTML = `${grade}`
         if (this.finalTime) {
             this.finalTime.innerHTML = finishTimeString;
         }
+        this.scoreModal.classList.add("show");
     }
     
 }
@@ -398,7 +416,7 @@ class GameManager {
         this.inputManager = new InputManager(gameElements.inputContainer);
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
         this.hintManager = new HintManager(gameElements.hintText); 
-        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
+        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreModalWrapper, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
         this.wordQueueManager = new WordQueueManager(gameElements.wordsetName, gameElements.wordsetDifficulty);
 
@@ -530,6 +548,7 @@ class GameManager {
     completeGame() {
         const finalTime = (this.timerManager)? this.timerManager.stopTimer():0;
         this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime);
+        this.audioManager.playGameFinishSound();
     }
 }
 
@@ -626,10 +645,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         inputContainer: document.getElementById('inputContainer'),
         wordChannel: document.getElementById('primaryAudio'),
         answerChannel: document.getElementById('answerSound'),
-        scoreModal: document.getElementById('scoreModalWrapper'),
+        scoreModalWrapper: document.getElementById('scoreModalWrapper'),
         scoreText: document.getElementById('scoreText'),
         circleContainer: document.getElementById('circleContainer'),
 
+        scoreModal: timerOn? document.getElementById('scoreAndTimerModal'): document.getElementById('scoreModal'),
         scoreGrade: timerOn? document.getElementById('scoreAndTimerGrade'): document.getElementById('scoreGrade'),
         scoreText: timerOn? document.getElementById('scoreAndTimerText'): document.getElementById('scoreText'),
         timerDisplay: timerOn? document.getElementById('timerDisplay'):null,
