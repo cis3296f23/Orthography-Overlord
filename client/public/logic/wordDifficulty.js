@@ -5,6 +5,13 @@ class WordDifficultyManager {
 
     calculateWordListDifficulty(wordList) {
         for(var word of wordList) {
+            
+            word = word.toLowerCase();
+            let regex = /^[a-z]+$/
+            if(!regex.test(word)) {
+                continue;
+            }
+
             var difficulty = this.calculateDifficulty(word);
             if(difficulty in this.wordmap) {
                 this.wordmap[difficulty].push(word);
