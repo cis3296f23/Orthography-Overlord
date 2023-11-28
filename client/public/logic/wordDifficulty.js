@@ -1,9 +1,9 @@
 class WordDifficultyManager {
     constructor() {
         this.wordmap = {};
-        this.easy = {};
-        this.medium = {};
-        this.hard = {};
+        this.easy = [];
+        this.medium = [];
+        this.hard = [];
     }
 
     calculateWordListDifficulty(wordList) {
@@ -24,6 +24,21 @@ class WordDifficultyManager {
             }
         }
         console.log(this.wordmap);
+        for(const key in this.wordmap) {
+            if(key < 17){
+                this.easy.push(...this.wordmap[key]);
+            }
+            else if(key < 22){
+                this.medium.push(...this.wordmap[key]);
+            }
+            else{
+                this.hard.push(...this.wordmap[key]);
+            }
+        }  
+        console.log(this.easy);
+        console.log(this.medium);
+        console.log(this.hard);
+        return this.easy, this.medium, this.hard;
     }
 
     calculateDifficulty(currentWord) {
