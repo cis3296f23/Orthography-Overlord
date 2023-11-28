@@ -1,6 +1,9 @@
 class WordDifficultyManager {
     constructor() {
         this.wordmap = {};
+        this.easy = {};
+        this.medium = {};
+        this.hard = {};
     }
 
     calculateWordListDifficulty(wordList) {
@@ -82,7 +85,7 @@ class WordDifficultyManager {
             bestFrequency += letterFrequencies.e;
         }
 
-        return totalFrequency / bestFrequency;
+        return 1 - (totalFrequency / bestFrequency);
     } 
 
     consonantSequenceCount(currentWord) {
