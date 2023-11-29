@@ -38,7 +38,7 @@ class WordDifficultyManager {
         console.log(this.easy);
         console.log(this.medium);
         console.log(this.hard);
-        return this.easy, this.medium, this.hard;
+        return [this.easy, this.medium, this.hard];
     }
 
     calculateDifficulty(currentWord) {

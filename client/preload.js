@@ -19,10 +19,11 @@ function loadDifficulty() {
             return [];
         }
         const words = wordSetData.split(',');
-    wordDifficultyManager.calculateWordListDifficulty(words);
+    return wordDifficultyManager.calculateWordListDifficulty(words);
 }
 
-loadDifficulty();
+let sets = loadDifficulty();
+console.log(sets);
 
 function switchPage(pagename) {
     if(pagename in PAGES) {
@@ -55,6 +56,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     switchPage: switchPage,
     loadAudioForWord: loadAudioForWord,
     loadDifficulty: loadDifficulty,
+    sets: sets,
     fs: fs,
 })
 

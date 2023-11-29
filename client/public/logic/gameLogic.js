@@ -312,24 +312,26 @@ class ScoreManager {
 }
 class WordQueueManager {
     constructor(wordSetPath) {
-        this.wordSetPath = wordSetPath;
+        this.wordSetPat = wordSetPath;
         this.wordQueue = []
     }
-    fillWordQueue(arraySize) {
-        this.wordQueue = this._getRandomWordQueue(arraySize);
+    fillWordQueue(arraySize, wordSetIndex) {
+        this.wordQueue = this._getRandomWordQueue(arraySize, wordSetIndex);
         return this.wordQueue;
     }
 
-    _getRandomWordQueue(arraySize) {
-        const fs = window.electronAPI.fs;
-        let wordSetData;
+    _getRandomWordQueue(arraySize, wordSetIndex) {
+        //const fs = window.electronAPI.fs;
+        const sets = window.electronAPI.sets;
+        /*let wordSetData;
         try {
             wordSetData = fs.readFileSync(this.wordSetPath, 'utf-8');
         } catch (error) {
             console.error('Error reading the file:', error);
             return [];
-        }
-        const words = wordSetData.split(',');
+        } 
+        const words = wordSetData.split(','); */
+        const words = [...sets[wordSetIndex]];
         const actualArraySize = Math.min(arraySize, words.length);
         const shuffledWords = this._shuffleArray(words);
 
@@ -407,8 +409,8 @@ class GameManager {
         this.inRetryStage = false;
     }
     
-    async setupGame(numWords) {
-        const wordList = this.wordQueueManager.fillWordQueue(numWords);
+    async setupGame(numWords, difficulty) {
+        const wordList = this.wordQueueManager.fillWordQueue(numWords, difficulty);
 
         this.wordList = wordList.map((w) => {
             return {
@@ -529,6 +531,7 @@ class GameManager {
 window.addEventListener('DOMContentLoaded', async () => {
     // GAME SETTINGS
     let numWords = 5; 
+    let selectedDifficulty = 0;
 
     // Event listeners for keyboard navigation of the game settings
     const radioButtons = document.querySelectorAll('input[name="numWords"]');
@@ -569,6 +572,9 @@ window.addEventListener('DOMContentLoaded', async () => {
                     break;
                 }
             }
+            const difficulty = document.getElementById("difficulty");
+            selectedDifficulty = difficulty.value;
+            console.log(selectedDifficulty)
             document.getElementById('gameSettings').style.display = 'none';
             document.getElementById('circleContainer').classList.remove('hidden');
             document.getElementById('topDisplayWrapper').classList.remove('hidden');
@@ -595,7 +601,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         timerDisplay: document.getElementById('timerDisplay'),
         finalTime: document.getElementById('timerText'),
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
-        wordSetPath: "./public/word-sets/foods.csv",
+        wordSetPath: "./public/word-sets/words.csv",
     }
     const game = new GameManager(gameElements);
 
@@ -609,5 +615,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     scoreModalButton.addEventListener('click', switchToMenu);
     quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(numWords);
+    game.setupGame(numWords, selectedDifficulty);
 });
