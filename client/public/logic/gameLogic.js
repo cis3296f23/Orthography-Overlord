@@ -1,5 +1,3 @@
-const fs = window.electronAPI.fs;
-
 class CircleManager {
     constructor(_circleContainer, _gameManager) {
         this.circleContainer = _circleContainer
@@ -187,17 +185,23 @@ class AudioManager {
 
     loadAudio = async (word) => { return window.electronAPI.loadAudioForWord(word) }
 
-    async loadAudioForCurrentGame(wordList) {
+    async loadAudioForCurrentGame(wordList, requiredCount) {
+        var validWordlist = [];
+
         for(var w of wordList) {
+            if(validWordlist.length == requiredCount) {
+                break;
+            }
             try {
-                console.log(w);
                 var filename = await this.loadAudio(w);
-                console.log(filename);
+                this.loadedAudio[w] = filename;
+                validWordlist.push(w);
             } catch(e) {
                 console.error("Could not load a file.", e);
             }
-            this.loadedAudio[w] = filename;
         }
+
+        return validWordlist;
     }
 
     setAudioForWord(word) {
@@ -218,6 +222,14 @@ class AudioManager {
         }
         this.answerSound.play();
     }
+
+    playGameFinishSound() {
+        const gameFinishSound = document.getElementById('winGameSound');
+        setTimeout(function() {
+            gameFinishSound.volume = 0.7;
+            gameFinishSound.play();
+        }, 1000);
+    }
 }
 
 class HintManager {
@@ -225,7 +237,7 @@ class HintManager {
         this.hintDisplay = _hintDisplay;
         this.hintsForCurrentWord = 0;
         // map to word later
-        this.hintHistory = [];
+        this.hintHistory = {};
     }
 
     hintConstructor(currentWord, userInput) {
@@ -247,12 +259,12 @@ class HintManager {
     }
     
     displayHint(currentWord, userInput) {
-        let hint = this.hintConstructor(currentWord, userInput)
-        this.hintDisplay.innerHTML = "Hint: " + hint
+        let hint = this.hintConstructor(currentWord, userInput);
+        this.hintDisplay.innerHTML = "Hint: " + hint;
+        (currentWord in this.hintHistory)? this.hintHistory[currentWord]++ : this.hintHistory[currentWord]=1;
     }
 
     clearHint() {
-        this.hintHistory.push(this.hintsForCurrentWord);
         this.hintsForCurrentWord = 0;
         this.hintDisplay.innerHTML = ""
     }
@@ -261,8 +273,9 @@ class HintManager {
 
 class ScoreManager {
 
-    constructor(_scoreModal, _scoreDisplay, _scoreGrade, _finalTime) {
+    constructor(_scoreModal,_scoreModalWrapper ,_scoreDisplay, _scoreGrade, _finalTime) {
         this.scoreModal = _scoreModal;
+        this.scoreModalWrapper = _scoreModalWrapper;
         this.scoreDisplay = _scoreDisplay;
         this.scoreGrade = _scoreGrade;
         this.finalTime = _finalTime;
@@ -272,7 +285,7 @@ class ScoreManager {
     calculateAndDisplayScore(hintHistory, wordCount, finishTimeString) {
         var perWordScore = 100 / wordCount;
 
-        for(var hints of hintHistory) {
+        for(let hints of Object.values(hintHistory)) {
             switch(hints) {
                 case 0:
                     break;
@@ -280,39 +293,52 @@ class ScoreManager {
                     this.score -= 0.2 * perWordScore;
                     break;
                 case 2: 
-                    this.score -= 0.4 * perWordScore;
+                    this.score -= 0.5 * perWordScore;
                     break;
                 case 3:
-                    this.score -= 0.7 * perWordScore;
+                    this.score -= 0.9 * perWordScore;
                     break;
                 default:
                     this.score -= perWordScore;
             }
         }
 
-        var grade = "D";
+        var grade = "F-";
         if(this.score == 100) {
             grade = "S+";
         } else if(this.score > 90) {
             grade = "A";
         } else if(this.score > 85) {
-            grade = "A-";
+            grade = "B+";
         } else if(this.score > 80) {
             grade = "B";
-        } else if(this.score > 70) {
-            grade = "C";
+        } else if(this.score > 75) {
+            grade = "C+";
+        } else if (this.score > 70) {
+            grade = "C"
+        } else if (this.score > 60) {
+            grade = "D+"
+        } else if (this.score > 50) {
+            grade = "D"
+        } else if (this.score >25) {
+            grade = "F"
         }
 
-        this.scoreModal.classList.toggle("hidden");
+        this.scoreModalWrapper.classList.toggle("hidden");
         this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
         this.scoreGrade.innerHTML = `${grade}`
-        this.finalTime.innerHTML = finishTimeString;
+        if (this.finalTime) {
+            this.finalTime.innerHTML = finishTimeString;
+        }
+        this.scoreModal.classList.add("show");
     }
     
 }
+
 class WordQueueManager {
-    constructor(wordSetPath) {
-        this.wordSetPat = wordSetPath;
+    constructor(_wordsetName, _wordsetDifficulty) {
+        this.wordsetName = _wordsetName
+        this.wordsetDifficulty = _wordsetDifficulty;
         this.wordQueue = []
     }
     fillWordQueue(arraySize, wordSetIndex) {
@@ -320,18 +346,9 @@ class WordQueueManager {
         return this.wordQueue;
     }
 
-    _getRandomWordQueue(arraySize, wordSetIndex) {
-        //const fs = window.electronAPI.fs;
-        const sets = window.electronAPI.sets;
-        /*let wordSetData;
-        try {
-            wordSetData = fs.readFileSync(this.wordSetPath, 'utf-8');
-        } catch (error) {
-            console.error('Error reading the file:', error);
-            return [];
-        } 
-        const words = wordSetData.split(','); */
-        const words = [...sets[wordSetIndex]];
+    _getRandomWordQueue(arraySize) {
+        const words = window.electronAPI.loadWordset(this.wordsetName, this.wordsetDifficulty);
+        console.log(words);
         const actualArraySize = Math.min(arraySize, words.length);
         const shuffledWords = this._shuffleArray(words);
 
@@ -392,13 +409,16 @@ class timerManager {
 
 class GameManager {
     constructor(gameElements) {
+        if (gameElements.timerDisplay!=null) {
+            this.timerManager = new timerManager(gameElements.timerDisplay);
+        }
+
         this.inputManager = new InputManager(gameElements.inputContainer);
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
         this.hintManager = new HintManager(gameElements.hintText); 
-        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
+        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreModalWrapper, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
-        this.wordQueueManager = new WordQueueManager(gameElements.wordSetPath);
-        this.timerManager = new timerManager(gameElements.timerDisplay);
+        this.wordQueueManager = new WordQueueManager(gameElements.wordsetName, gameElements.wordsetDifficulty);
 
         this.wordList = [];
 
@@ -409,12 +429,15 @@ class GameManager {
         this.inRetryStage = false;
     }
     
-    async setupGame(numWords, difficulty) {
-        const wordList = this.wordQueueManager.fillWordQueue(numWords, difficulty);
+    async setupGame(numWords) {
+        const wordList = this.wordQueueManager.fillWordQueue(numWords+10, difficulty);
+        // include some backup words
+        var validWords = await this.audioManager.loadAudioForCurrentGame(wordList);
+        validWords = validWords.slice(0, numWords);
 
-        this.wordList = wordList.map((w) => {
+        this.wordList = validWords.map((w) => {
             return {
-                word: w, 
+                word: w.toLowerCase(), 
                 needsRetry: false, 
                 displayAsRedeemedWord: false,
                 firstTried: false, 
@@ -422,12 +445,13 @@ class GameManager {
             };
         });
 
-        await this.audioManager.loadAudioForCurrentGame(wordList);
-
+        document.getElementById("loadingBlurb").classList.add("hidden");
         this.currentWordIndex = 0;
         this.circleManager.displayCircles();
         this.loadWord();
-        this.timerManager.startTimer();
+        if (this.timerManager) {
+            this.timerManager.startTimer();
+        }
     }
 
     fillRetryableWordList() {
@@ -522,8 +546,9 @@ class GameManager {
     }
 
     completeGame() {
-        const finalTime = this.timerManager.stopTimer();
+        const finalTime = (this.timerManager)? this.timerManager.stopTimer():0;
         this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime);
+        this.audioManager.playGameFinishSound();
     }
 }
 
@@ -531,16 +556,34 @@ class GameManager {
 window.addEventListener('DOMContentLoaded', async () => {
     // GAME SETTINGS
     let numWords = 5; 
+    let timerOn = true;
     let selectedDifficulty = 0;
 
+    const wordsetSelectionMenu = document.getElementById("wordsetSelector");
+    for(var wordset of Object.keys(window.electronAPI.availableWordsets)) {
+        const option = document.createElement("option");
+        option.value = wordset;
+        option.innerHTML = wordset;
+        wordsetSelectionMenu.appendChild(option);
+    }
+
     // Event listeners for keyboard navigation of the game settings
-    const radioButtons = document.querySelectorAll('input[name="numWords"]');
+    const wordsRadioButtons = document.querySelectorAll('input[name="numWords"]');
+    const timerRadioButtons = document.querySelectorAll('input[name="timedMode"]');
+    const radioButtonsArr = [wordsRadioButtons, timerRadioButtons]
+    let currentRadioButtons = wordsRadioButtons
     function handleKeyPress(event) {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-            const currentIndex = Array.from(radioButtons).findIndex(button => button.checked);
+            const currentIndex = Array.from(currentRadioButtons).findIndex(button => button.checked);
             const offset = (event.key === 'ArrowRight') ? 1 : -1;
-            const nextIndex = (currentIndex + offset + radioButtons.length) % radioButtons.length;
-            radioButtons[nextIndex].checked = true;
+            const nextIndex = (currentIndex + offset + currentRadioButtons.length) % currentRadioButtons.length;
+            currentRadioButtons[nextIndex].checked = true;
+        }
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            const currentIndex = radioButtonsArr.indexOf(currentRadioButtons);
+            const offset = (event.key === 'ArrowDown') ? 1 : -1;
+            const nextIndex = (currentIndex + offset + radioButtonsArr.length) % radioButtonsArr.length;
+            currentRadioButtons = radioButtonsArr[nextIndex]
         }
     }
     document.addEventListener('keydown', handleKeyPress);
@@ -565,20 +608,32 @@ window.addEventListener('DOMContentLoaded', async () => {
     const continuePromise = new Promise(resolve => {
         const continueButton = document.getElementById('continueButton');
         continueButton.addEventListener('click', function () {
-            const radioButtons = document.getElementsByName("numWords");
-            for (const radioButton of radioButtons) {
-                if (radioButton.checked) {
-                    numWords = parseInt(radioButton.value);
+            const numWordsOptions = document.getElementsByName("numWords");
+            for (const numWordsOption of numWordsOptions) {
+                if (numWordsOption.checked) {
+                    numWords = parseInt(numWordsOption.value);
                     break;
                 }
             }
             const difficulty = document.getElementById("difficulty");
             selectedDifficulty = difficulty.value;
             console.log(selectedDifficulty)
+            const timedModeOptions = document.getElementsByName("timedMode")
+            for (const timedModeOption of timedModeOptions) {
+                if (timedModeOption.checked) {
+                    timerOn = (timedModeOption.value == "on")? true:false;
+                }
+            }
+            if (timerOn) {
+                document.getElementById('timerWrapper').classList.remove('hidden');
+            } else {
+                document.getElementById("scoreAndTimerModal").classList.add("hidden");
+                document.getElementById("scoreModal").classList.remove("hidden")
+            }
+
             document.getElementById('gameSettings').style.display = 'none';
             document.getElementById('circleContainer').classList.remove('hidden');
             document.getElementById('topDisplayWrapper').classList.remove('hidden');
-            document.getElementById('timerWrapper').classList.remove('hidden');
             document.getElementsByClassName('typezone')[0].classList.remove('hidden');
 
             // Remove the keyboard event listener
@@ -594,14 +649,18 @@ window.addEventListener('DOMContentLoaded', async () => {
         inputContainer: document.getElementById('inputContainer'),
         wordChannel: document.getElementById('primaryAudio'),
         answerChannel: document.getElementById('answerSound'),
-        scoreModal: document.getElementById('scoreModalWrapper'),
+        scoreModalWrapper: document.getElementById('scoreModalWrapper'),
         scoreText: document.getElementById('scoreText'),
-        scoreGrade: document.getElementById('scoreGrade'),
         circleContainer: document.getElementById('circleContainer'),
-        timerDisplay: document.getElementById('timerDisplay'),
-        finalTime: document.getElementById('timerText'),
+
+        scoreModal: timerOn? document.getElementById('scoreAndTimerModal'): document.getElementById('scoreModal'),
+        scoreGrade: timerOn? document.getElementById('scoreAndTimerGrade'): document.getElementById('scoreGrade'),
+        scoreText: timerOn? document.getElementById('scoreAndTimerText'): document.getElementById('scoreText'),
+        timerDisplay: timerOn? document.getElementById('timerDisplay'):null,
+        finalTime: timerOn? document.getElementById('timerText'):null,
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
-        wordSetPath: "./public/word-sets/words.csv",
+        wordsetName: wordsetSelectionMenu.value,
+        wordsetDifficulty: "easy"
     }
     const game = new GameManager(gameElements);
 

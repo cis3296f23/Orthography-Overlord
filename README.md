@@ -22,3 +22,10 @@ Follow this project board to know the latest status of the project: [https://git
 - Run `npm i` to install required packages.
 - Execute `npm start` or `npm run start` to start the app.
 - Execute `npm run make` to compile the app for release.
+
+### Orthography Overlord Server
+- `cd` into the server directory
+- Run `npm i` to install required packages.
+- Execute `npm start` or `npm run start` to start the server.
+- Access the server over http. By default, it runs on port 3050.
+- Todo: Provide your own API key.
