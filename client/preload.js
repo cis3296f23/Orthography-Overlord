@@ -14,22 +14,6 @@ const PAGES = {
     "CONTINUE": "game.html",    //placeholder
 }
 
-function loadDifficulty() {
-    let wordDifficultyManager = new WordDifficultyManager();
-    let wordSetData;
-        try {
-            wordSetData = fs.readFileSync('./public/word-sets/words.csv', 'utf-8');
-        } catch (error) {
-            console.error('Error reading the file:', error);
-            return [];
-        }
-        const words = wordSetData.split(',');
-    return wordDifficultyManager.calculateWordListDifficulty(words);
-}
-
-let sets = loadDifficulty();
-console.log(sets);
-
 const WORDSETS = {
     "Food": "foods.csv",
     "Medical Vocabulary": "medical.csv",
@@ -51,12 +35,25 @@ function switchPage(pagename) {
 // AND MOVE THIS FUNCTION TO MAIN.JS
 // COMMUNICATE VIA IPC
 
-function loadWordset(wordsetName, difficulty) {
+function loadWordset(wordsetName, difficultyInt) {
     if(wordsetName in WORDSETS) {
         try {
             var pathToSet = path.join(WORDSETPATH, WORDSETS[wordsetName]);
             var set = fs.readFileSync(pathToSet, 'utf-8');
-            return set.split(',');
+            var data = set.split(',');
+            let wordDifficultyManager = new WordDifficultyManager();
+            var difficulties = wordDifficultyManager.calculateWordListDifficulty(data);
+
+            // difficulty is 0, 1 or 2
+            // (easy, medium, hard);
+
+            if(difficultyInt > 2) {
+                difficultyInt = 2;
+            } else if(difficultyInt < 0) {
+                difficultyInt = 0;
+            }
+
+            return difficulties[difficultyInt];
         } catch(e) {
             console.error("Could not read from wordset", wordsetName, WORDSETS[wordsetName], e);
             return [];
@@ -88,8 +85,6 @@ async function loadAudioForWord(word) {
 contextBridge.exposeInMainWorld('electronAPI', {
     switchPage: switchPage,
     loadAudioForWord: loadAudioForWord,
-    loadDifficulty: loadDifficulty,
-    sets: sets,
     loadWordset: loadWordset,
     availableWordsets: WORDSETS
 })

@@ -341,8 +341,10 @@ class WordQueueManager {
         this.wordsetDifficulty = _wordsetDifficulty;
         this.wordQueue = []
     }
-    fillWordQueue(arraySize, wordSetIndex) {
-        this.wordQueue = this._getRandomWordQueue(arraySize, wordSetIndex);
+    fillWordQueue(arraySize) {
+        this.wordQueue = this._getRandomWordQueue(arraySize);
+        console.log("Word queue for current game:");
+        console.log(this.wordQueue);
         return this.wordQueue;
     }
 
@@ -430,7 +432,7 @@ class GameManager {
     }
     
     async setupGame(numWords) {
-        const wordList = this.wordQueueManager.fillWordQueue(numWords+10, difficulty);
+        const wordList = this.wordQueueManager.fillWordQueue(numWords+10);
         // include some backup words
         var validWords = await this.audioManager.loadAudioForCurrentGame(wordList);
         validWords = validWords.slice(0, numWords);
@@ -660,7 +662,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         finalTime: timerOn? document.getElementById('timerText'):null,
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordsetName: wordsetSelectionMenu.value,
-        wordsetDifficulty: "easy"
+        wordsetDifficulty: selectedDifficulty,
     }
     const game = new GameManager(gameElements);
 
@@ -674,5 +676,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     scoreModalButton.addEventListener('click', switchToMenu);
     quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(numWords, selectedDifficulty);
+    game.setupGame(numWords);
 });
