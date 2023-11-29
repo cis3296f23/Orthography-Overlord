@@ -49,6 +49,24 @@ function loadWordset(wordsetName, difficulty) {
     }
 }
 
+//loadAudioforword copy paste
+//call main.js to get request
+
+async function loadDefForWord(word) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.send("make-dictionary-request", word);
+
+        ipcRenderer.on('dictionary-data-response', (event, filename) => {
+            // sound.src = filename;
+            resolve(filename);
+        });
+
+        ipcRenderer.on('dictionary-error-response', (event, error) => {
+            reject(error);
+        });
+    })
+}
+
 async function loadAudioForWord(word) {
     return new Promise((resolve, reject) => {
         ipcRenderer.send("make-dictionary-request", word);

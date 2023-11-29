@@ -56,6 +56,8 @@ function download(response, path) {
     })
 }
 
+//pipe back response over event
+
 async function retrieveAudioFileForWord(event, word) {
   const url = `${API_ADDRESS}/audio/${word}`
   // const url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;

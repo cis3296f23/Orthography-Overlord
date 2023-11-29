@@ -407,6 +407,15 @@ class timerManager {
     }
 }
 
+class DefinitionManager{
+
+    constructor(){
+
+    }
+
+
+}
+
 class GameManager {
     constructor(gameElements) {
         if (gameElements.timerDisplay!=null) {
@@ -419,6 +428,7 @@ class GameManager {
         this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreModalWrapper, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
         this.wordQueueManager = new WordQueueManager(gameElements.wordsetName, gameElements.wordsetDifficulty);
+        this.defManager = new DefinitionManager()
 
         this.wordList = [];
 
@@ -657,6 +667,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordsetName: wordsetSelectionMenu.value,
         wordsetDifficulty: "easy"
+
+
     }
     const game = new GameManager(gameElements);
 

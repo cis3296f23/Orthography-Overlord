@@ -170,6 +170,11 @@ body {
     background-color: #400000;
 }
 
+#defButton{
+    position: absolute;
+    background-color: #0D2331;
+}
+
 .letters input {
     width: 60px;
     height: 60px;
