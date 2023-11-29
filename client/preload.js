@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 const fs = require('fs');
+const WordDifficultyManager = require('./public/logic/wordDifficulty');
 const path = require('path');
 const WORDSETPATH = "./public/word-sets/";
 
@@ -34,12 +35,25 @@ function switchPage(pagename) {
 // AND MOVE THIS FUNCTION TO MAIN.JS
 // COMMUNICATE VIA IPC
 
-function loadWordset(wordsetName, difficulty) {
+function loadWordset(wordsetName, difficultyInt) {
     if(wordsetName in WORDSETS) {
         try {
             var pathToSet = path.join(WORDSETPATH, WORDSETS[wordsetName]);
             var set = fs.readFileSync(pathToSet, 'utf-8');
-            return set.split(',');
+            var data = set.split(',');
+            let wordDifficultyManager = new WordDifficultyManager();
+            var difficulties = wordDifficultyManager.calculateWordListDifficulty(data);
+
+            // difficulty is 0, 1 or 2
+            // (easy, medium, hard);
+
+            if(difficultyInt > 2) {
+                difficultyInt = 2;
+            } else if(difficultyInt < 0) {
+                difficultyInt = 0;
+            }
+
+            return difficulties[difficultyInt];
         } catch(e) {
             console.error("Could not read from wordset", wordsetName, WORDSETS[wordsetName], e);
             return [];
