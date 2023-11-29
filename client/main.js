@@ -87,5 +87,5 @@ function loadHTML(event, filename) {
 
 // declare new event listener
 ipcMain.on("make-dictionary-request", retrieveAudioFileForWord);
-
 ipcMain.on('load-html', loadHTML);
+ipcMain.on("get-user-path", (event) => { event.reply("user-path-response", app.getPath("userData"))})

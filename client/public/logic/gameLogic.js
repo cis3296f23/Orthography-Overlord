@@ -561,8 +561,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     let timerOn = true;
     let selectedDifficulty = 0;
 
+    var foundWordsets = window.electronAPI.wordsets;
+    
     const wordsetSelectionMenu = document.getElementById("wordsetSelector");
-    for(var wordset of Object.keys(window.electronAPI.availableWordsets)) {
+    for(var wordset of Object.keys(foundWordsets)) {
         const option = document.createElement("option");
         option.value = wordset;
         option.innerHTML = wordset;
