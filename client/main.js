@@ -4,8 +4,8 @@ const path = require('node:path')
 const axios = require('axios');
 const fs = require('fs');
 const userpath = app.getPath("userData");
-const API_ADDRESS = "http://157.245.136.109:3050";
-// const API_ADDRESS = "http://localhost:3050";
+// const API_ADDRESS = "http://157.245.136.109:3050";
+const API_ADDRESS = "http://localhost:3050";
 
 // **************
 // ELECTRON SETUP
@@ -56,6 +56,8 @@ function download(response, path) {
     })
 }
 
+//pipe back response over event
+
 async function retrieveAudioFileForWord(event, word) {
   const url = `${API_ADDRESS}/audio/${word}`
   // const url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;
@@ -78,6 +80,27 @@ async function retrieveAudioFileForWord(event, word) {
   }
 }
 
+/* This function retrieves the word's data from the server, stores it in a
+* a user file and sends the location of that file to the preload for exposure
+* in the main world                                                           */
+async function retrieveDefinitionFileForWord(event, word) {
+
+  console.log("Main.js Test: 'retrieveDef #1'");
+
+  //words location on server, if present
+  const serverLoc = `${API_ADDRESS}/def/${word}`
+
+  //otherwise get from
+  try {
+    //get stream for word on server
+    const def = await axios.get(serverLoc);
+    event.reply("definition-data-response", JSON.stringify(def.data));
+  } catch(err) {
+    console.error(err);
+    event.reply("defintion-error-response", JSON.stringify(err));
+  }
+}
+
 
 function loadHTML(event, filename) {
   const win = BrowserWindow.getFocusedWindow();
@@ -85,7 +108,7 @@ function loadHTML(event, filename) {
 }
 
 
-// declare new event listener
-ipcMain.on("make-dictionary-request", retrieveAudioFileForWord);
+ipcMain.on("make-definition-request", retrieveDefinitionFileForWord);
+
 ipcMain.on('load-html', loadHTML);
 ipcMain.on("get-user-path", (event) => { event.reply("user-path-response", app.getPath("userData"))})

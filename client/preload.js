@@ -92,6 +92,24 @@ function loadWordset(wordsetName, difficultyInt) {
     }
 }
 
+//loadAudioforword copy paste
+//call main.js to get request
+
+async function loadDefForWord(word) {
+    return new Promise((resolve, reject) => {
+
+        ipcRenderer.send("make-definition-request", word);
+
+        ipcRenderer.on('definition-data-response', (event, def) => {
+            resolve(def);
+        });
+
+        ipcRenderer.on('definition-error-response', (event, error) => {
+            reject(error);
+        });
+    })
+}
+
 function getUserPath() {
     return new Promise((resolve, reject) => {
 
@@ -132,6 +150,8 @@ getWordsets().then(() => {
         switchPage: switchPage,
         loadAudioForWord: loadAudioForWord,
         loadWordset: loadWordset,
+        loadDefForWord: loadDefForWord,
         wordsets: wordsets
     })
 });
+

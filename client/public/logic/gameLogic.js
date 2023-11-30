@@ -65,7 +65,7 @@ class CircleManager {
             const redeemable = word.displayAsRedeemedWord;
             const seen = word.seen;
             const success = word.firstTried;
-            
+
             const circle = this.circleList[subset.indexOf(word)];
             if(circle.classList.contains("animating")) {
                 circle.classList = "";
@@ -77,14 +77,14 @@ class CircleManager {
             circle.innerHTML = "";
 
             if(redeemable) { circle.classList.add("retry"); }
-            
+
             if(seen) {
                 circle.classList.add(success ? "complete" : "failed")
                 var mark = this.makeMark(success, redeemable);
                 circle.appendChild(mark);
             }
         }
-        
+
         this.circleList[currentIndexInSubset].classList.add("current");
     }
 
@@ -99,7 +99,7 @@ class CircleManager {
         dummy.classList.add("transparent");
         this.circleContainer.append(dummy);
     }
-    
+
     addCircle() {
         var circle = document.createElement("div");
         this.circleContainer.append(circle);
@@ -152,7 +152,7 @@ class InputManager {
         fallZone.classList.add("fallZone","letters");
 
         for(var box of this.currentInputBoxes) {
-   
+
             var duration = (Math.random() * 0.1) + 1;
             box.style.animation = `fall ${duration}s ease-in forwards`;
             fallZone.append(box);
@@ -184,6 +184,7 @@ class AudioManager {
     }
 
     loadAudio = async (word) => { return window.electronAPI.loadAudioForWord(word) }
+
 
     async loadAudioForCurrentGame(wordList, requiredCount) {
         var validWordlist = [];
@@ -257,7 +258,7 @@ class HintManager {
         this.hintsForCurrentWord++;
         return hint;
     }
-    
+
     displayHint(currentWord, userInput) {
         let hint = this.hintConstructor(currentWord, userInput);
         this.hintDisplay.innerHTML = "Hint: " + hint;
@@ -281,7 +282,7 @@ class ScoreManager {
         this.finalTime = _finalTime;
         this.score = 100;
     }
-    
+
     calculateAndDisplayScore(hintHistory, wordCount, finishTimeString) {
         var perWordScore = 100 / wordCount;
 
@@ -292,7 +293,7 @@ class ScoreManager {
                 case 1:
                     this.score -= 0.2 * perWordScore;
                     break;
-                case 2: 
+                case 2:
                     this.score -= 0.5 * perWordScore;
                     break;
                 case 3:
@@ -332,7 +333,7 @@ class ScoreManager {
         }
         this.scoreModal.classList.add("show");
     }
-    
+
 }
 
 class WordQueueManager {
@@ -373,18 +374,18 @@ class timerManager {
         this.interval_id = null;
         this.timerDisplay = timerDisplay;
     }
-    
+
     startTimer() {
         if (!this.isRunning) {
         this.startTime = Date.now() - (this.elapsedTime || 0);
         this.isRunning = true;
-    
+
         this.interval_id = setInterval(() => {
             this._updateDisplay();
         }, 50); // update display every 50 ms (20 fps)
         }
     }
-    
+
     stopTimer() {
         if (this.isRunning) {
             clearInterval(this.interval_id);
@@ -393,19 +394,26 @@ class timerManager {
         }
         return this.timerDisplay.textContent;
     }
-    
+
     _updateDisplay() {
         const elapsedTime = Date.now() - this.startTime;
         const minutes = Math.floor(elapsedTime / (60 * 1000));
         const seconds = Math.floor((elapsedTime % (60 * 1000)) / 1000);
         const centiseconds = Math.floor((elapsedTime % 1000) / 10);
-    
+
         const displayString = `${this._formatTimeComponent(minutes)}:${this._formatTimeComponent(seconds)}.${this._formatTimeComponent(centiseconds)}`;
         this.timerDisplay.textContent = displayString;
     }
-    
+
     _formatTimeComponent(value) {
         return value < 10 ? `0${value}` : value;
+    }
+}
+
+class DefinitionManager{
+
+    constructor(){
+
     }
 }
 
@@ -417,10 +425,12 @@ class GameManager {
 
         this.inputManager = new InputManager(gameElements.inputContainer);
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
-        this.hintManager = new HintManager(gameElements.hintText); 
+        this.hintManager = new HintManager(gameElements.hintText);
         this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreModalWrapper, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
         this.wordQueueManager = new WordQueueManager(gameElements.wordsetName, gameElements.wordsetDifficulty);
+
+        this.defText = gameElements.defText;
 
         this.wordList = [];
 
@@ -430,7 +440,10 @@ class GameManager {
         this.gameActive = true;
         this.inRetryStage = false;
     }
-    
+
+
+
+
     async setupGame(numWords) {
         const wordList = this.wordQueueManager.fillWordQueue(numWords+10);
         // include some backup words
@@ -439,10 +452,10 @@ class GameManager {
 
         this.wordList = validWords.map((w) => {
             return {
-                word: w.toLowerCase(), 
-                needsRetry: false, 
+                word: w.toLowerCase(),
+                needsRetry: false,
                 displayAsRedeemedWord: false,
-                firstTried: false, 
+                firstTried: false,
                 seen: false
             };
         });
@@ -496,20 +509,59 @@ class GameManager {
         this.circleManager.displayCircles();
 
     }
-    
-    loadWord() {
+
+    async loadWord() {
         var currentWord = this.wordList[this.currentWordIndex];
         this.audioManager.setAudioForWord(currentWord.word);
         currentWord.seen = true;
         this.inputManager.clearInput();
         this.wordAddedToBack = false;
+        this.addDefinition(currentWord);
+    }
+
+    async addDefinition(currentWord){
+        console.log("Stuff");
+        //returns the filename of the current word data
+        let res = await window.electronAPI.loadDefForWord(currentWord.word);
+
+        // create a json object
+        let defJson = JSON.parse(res);
+
+        //find the 'short definition'
+        let shortDef = defJson[0].shortdef;
+        // let stems =
+
+        //iterate over the array of values
+        console.log('Before the loop'); // Add this line
+        let i = 0;
+        this.defText.innerHTML = '';
+
+        // Diplay word for debugging
+        // this.defText.innerHTML += currentWord.word.charAt(0).toUpperCase() + currentWord.word.slice(1);
+        // this.defText.innerHTML += '<br><br>';
+
+        while (shortDef && shortDef[i] !== undefined) {
+            console.log("before");
+            if(shortDef[i].toLowerCase().includes(currentWord.word)){
+                i++;
+                continue;
+            }
+            this.defText.innerHTML += shortDef[i].charAt(0).toUpperCase() + shortDef[i].slice(1);
+            this.defText.innerHTML += '<br><br>';
+            console.log(shortDef[i]);
+            i++;
+        }
+        if(this.defText.innerHTML == null || this.defText.innerHTML == ''){
+            this.defText.innerHTML += shortDef[0];
+        }
+
     }
 
     onTypeLetter = (e) => {
         if(!this.gameActive) return;
 
         let key = e.key.toLowerCase();
-        
+
         if(key == "enter") {
             this.checkCorrectWord();
         } else if(key == "backspace") {
@@ -557,7 +609,7 @@ class GameManager {
 
 window.addEventListener('DOMContentLoaded', async () => {
     // GAME SETTINGS
-    let numWords = 5; 
+    let numWords = 5;
     let timerOn = true;
     let selectedDifficulty = 0;
 
@@ -664,19 +716,46 @@ window.addEventListener('DOMContentLoaded', async () => {
         finalTime: timerOn? document.getElementById('timerText'):null,
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordsetName: wordsetSelectionMenu.value,
+        defText: document.getElementById('defText'),
         wordsetDifficulty: selectedDifficulty,
     }
+
     const game = new GameManager(gameElements);
 
     const replayButton = document.getElementById('replayButton');
     const quitButton = document.getElementById('quitButton');
     const scoreModalButton = document.getElementById('scoreModalButton');
 
-    replayButton.addEventListener('click', () => { gameElements.wordChannel.play(); 
+    replayButton.addEventListener('click', () => { gameElements.wordChannel.play();
     replayButton.blur()});
     document.addEventListener("keydown", game.onTypeLetter);
     scoreModalButton.addEventListener('click', switchToMenu);
     quitButton.addEventListener('click', switchToMenu);
 
     game.setupGame(numWords);
+
+    //==========================================================
+
+    //brings up Modal for definition
+    function showDefinition() {
+        console.log('Showing definition modal');
+        document.getElementById('defOverlay').style.display = 'block';
+        document.getElementById('defModal').style.display = 'block';
+    }
+
+    //hides Modal
+    function hideDefinition() {
+        console.log('Hiding definition modal');
+        document.getElementById('defOverlay').style.display = 'none';
+        document.getElementById('defModal').style.display = 'none';
+    }
+
+    //buttons for definition
+    document.getElementById('defButton').addEventListener('click',showDefinition)
+    document.getElementById('closeDef').addEventListener('click',hideDefinition)
+
+
+    // document.getElementById('defText').innerHTML = "Stuff";
+
+
 });
