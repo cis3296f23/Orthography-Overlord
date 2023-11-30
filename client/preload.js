@@ -54,14 +54,14 @@ function loadWordset(wordsetName, difficulty) {
 
 async function loadDefForWord(word) {
     return new Promise((resolve, reject) => {
-        ipcRenderer.send("make-dictionary-request", word);
 
-        ipcRenderer.on('dictionary-data-response', (event, filename) => {
-            // sound.src = filename;
-            resolve(filename);
+        ipcRenderer.send("make-definition-request", word);
+
+        ipcRenderer.on('definition-data-response', (event, def) => {
+            resolve(def);
         });
 
-        ipcRenderer.on('dictionary-error-response', (event, error) => {
+        ipcRenderer.on('definition-error-response', (event, error) => {
             reject(error);
         });
     })
@@ -90,6 +90,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     switchPage: switchPage,
     loadAudioForWord: loadAudioForWord,
     loadWordset: loadWordset,
+    loadDefForWord: loadDefForWord,
     availableWordsets: WORDSETS
 })
 

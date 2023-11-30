@@ -19,12 +19,8 @@ class FeatureServer {
 		} else { this.audioFolderPath = _audioFolderPath; }
 		console.log(this.audioFolderPath);
 
-		if(_defFolderPath[0] != "~") {
-			this.defFolderPath = path.join(__dirname, _defFolderPath);
-		} else {
-			this.defFolderPath = _defFolderPath;
-		}
 
+		this.defFolderPath = path.join(__dirname, _defFolderPath);
 	}
 
 	download(response, path) {
@@ -72,7 +68,8 @@ class FeatureServer {
 		return new Promise( async (resolve, reject) => {
 
 			const url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;
-			const filename = path.join(this.definitionFolderPath, `${word}.json`);
+			const filename = path.join(this.defFolderPath, `${word}.json`);
+			console.log("app.js filename: " + filename)
 
 			//check if the file already exists
 			if(fs.existsSync(filename)) {
@@ -81,10 +78,15 @@ class FeatureServer {
 			}
 
 			try {
-				const res = await axios.get(url, { responseType: 'stream' });
+				const res = await axios.get(url);
 				// res[0].def[0].sseq[0][0][0]
 
-				await this.download(res, filename)
+				var data = res.data;
+
+				console.log(data);
+				console.log(filename);
+				jsonfile.writeFileSync(filename, data);
+				// await this.download(res, filename)
 
 				resolve(filename);
 			} catch(err) {
@@ -125,6 +127,9 @@ class FeatureServer {
 			this.retrieveDefinitionFileForWord(req.params.word)
 				.then((filename) => {
 					//open as JSON and send back information
+					jsonfile.readFile(filename).then((data) => {
+							res.json(data);
+					})
 				})
 				.catch((err) => {
 					res.send(err);

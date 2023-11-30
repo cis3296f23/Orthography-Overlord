@@ -1,4 +1,5 @@
 dev_audio_folder/
+dev_def_folder/
 # Logs
 logs
 *.log
