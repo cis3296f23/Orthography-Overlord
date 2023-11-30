@@ -30,7 +30,8 @@ function getWordsets() {
                 console.log(file.split('.').pop());
                 if(file.split('.').pop() == "csv") {
                     console.log(file.split('.')[0])
-                    wordsets[file.split('.')[0]] = path.join(WORDSETPATH, file);
+                    console.log(path.join(WORDSETPATH, file));
+                    wordsets[file.split('.')[0]] = path.join(path.join(__dirname, WORDSETPATH), file);
                 }
             });
 
