@@ -7,6 +7,18 @@ Provide here instructions on how to use your application.
 
 - Run and play!
 
+## How to add your own wordsets
+### Mac OS:
+Navigate to Library/Application Support/orthography-overlord-client/wordsets
+If the wordsets folder does not exist, create it. 
+Any CSV files you place in this directory will be available as wordsets.
+
+
+### Windows:
+Navigate to C:\Users\YOURUSERNAME\AppData\Roaming\orthography-overlord-client\wordsets
+If the wordsets folder does not exist, create it. 
+Any CSV files you place in this directory will be available as wordsets.
+
 # How to contribute
 Follow this project board to know the latest status of the project: [https://github.com/orgs/cis3296f23/projects/113]([https://github.com/orgs/cis3296f23/projects/113])  
 
