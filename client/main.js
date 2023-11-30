@@ -109,6 +109,7 @@ function loadHTML(event, filename) {
 
 
 ipcMain.on("make-definition-request", retrieveDefinitionFileForWord);
+ipcMain.on("make-dictionary-request", retrieveAudioFileForWord);
 
 ipcMain.on('load-html', loadHTML);
 ipcMain.on("get-user-path", (event) => { event.reply("user-path-response", app.getPath("userData"))})
