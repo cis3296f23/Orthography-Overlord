@@ -344,6 +344,8 @@ class WordQueueManager {
     }
     fillWordQueue(arraySize) {
         this.wordQueue = this._getRandomWordQueue(arraySize);
+        console.log("Word queue for current game:");
+        console.log(this.wordQueue);
         return this.wordQueue;
     }
 
@@ -609,9 +611,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     // GAME SETTINGS
     let numWords = 5;
     let timerOn = true;
+    let selectedDifficulty = 0;
 
+    var foundWordsets = window.electronAPI.wordsets;
+    
     const wordsetSelectionMenu = document.getElementById("wordsetSelector");
-    for(var wordset of Object.keys(window.electronAPI.availableWordsets)) {
+    for(var wordset of Object.keys(foundWordsets)) {
         const option = document.createElement("option");
         option.value = wordset;
         option.innerHTML = wordset;
@@ -666,6 +671,9 @@ window.addEventListener('DOMContentLoaded', async () => {
                     break;
                 }
             }
+            const difficulty = document.getElementById("difficulty");
+            selectedDifficulty = difficulty.value;
+            console.log(selectedDifficulty)
             const timedModeOptions = document.getElementsByName("timedMode")
             for (const timedModeOption of timedModeOptions) {
                 if (timedModeOption.checked) {
@@ -708,8 +716,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         finalTime: timerOn? document.getElementById('timerText'):null,
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordsetName: wordsetSelectionMenu.value,
-        wordsetDifficulty: "easy",
-        defText: document.getElementById('defText')
+        defText: document.getElementById('defText'),
+        wordsetDifficulty: selectedDifficulty,
     }
 
     const game = new GameManager(gameElements);

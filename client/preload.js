@@ -1,7 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron')
 const fs = require('fs');
+const WordDifficultyManager = require('./public/logic/wordDifficulty');
 const path = require('path');
 const WORDSETPATH = "./public/word-sets/";
+var USERDATAPATH = "";
+
+
 
 // USER SETS WILL BE IN const userpath = app.getPath("userData");
 // USE MAIN.JS FOR THIS
@@ -13,10 +17,42 @@ const PAGES = {
     "CONTINUE": "game.html",    //placeholder
 }
 
-const WORDSETS = {
-    "Food": "foods.csv",
-    "Medical Vocabulary": "medical.csv",
-    "Geology Vocabulary": "geology.csv",
+var wordsets = {};
+
+function getWordsets() {
+    return new Promise((resolve, reject) => {
+        getUserPath().then((userpath) => {
+            // get preset paths
+            var files = fs.readdirSync(path.join(__dirname, WORDSETPATH));
+            console.log(files);
+            files.forEach(file => {
+                console.log(file);
+                console.log(file.split('.').pop());
+                if(file.split('.').pop() == "csv") {
+                    console.log(file.split('.')[0])
+                    wordsets[file.split('.')[0]] = path.join(WORDSETPATH, file);
+                }
+            });
+
+            // loading user files
+            console.log("looking for user's stuff");
+            console.log(path.join(userpath, "/wordsets"));
+            if(fs.existsSync(path.join(userpath, "/wordsets"))) {
+                var files = fs.readdirSync(path.join(userpath,"/wordsets"));
+                console.log(files);
+                files.forEach(file => {
+                    console.log(file);
+                    console.log(file.split('.').pop());
+                    if(file.split('.').pop() == "csv") {
+                        console.log(file.split('.')[0])
+                        wordsets[file.split('.')[0]] = path.join(userpath+"/wordsets", file);
+                    }
+                });
+            }
+
+            resolve(wordsets);
+        });
+    });
 }
 
 function switchPage(pagename) {
@@ -28,20 +64,27 @@ function switchPage(pagename) {
     }
 }
 
-// TODO:::::::::::::::::::::;
-// RUN WORD DIFFICULTY CALCULATION HERE
-// RETURN SUBSET OF WORDS THAT MATCH DESIRED DIFFICULTY
-// AND MOVE THIS FUNCTION TO MAIN.JS
-// COMMUNICATE VIA IPC
-
-function loadWordset(wordsetName, difficulty) {
-    if(wordsetName in WORDSETS) {
+function loadWordset(wordsetName, difficultyInt) {
+    if(wordsetName in wordsets) {
         try {
-            var pathToSet = path.join(WORDSETPATH, WORDSETS[wordsetName]);
+            var pathToSet = wordsets[wordsetName];
             var set = fs.readFileSync(pathToSet, 'utf-8');
-            return set.split(',');
+            var data = set.split(',');
+            let wordDifficultyManager = new WordDifficultyManager();
+            var difficulties = wordDifficultyManager.calculateWordListDifficulty(data);
+
+            // difficulty is 0, 1 or 2
+            // (easy, medium, hard);
+
+            if(difficultyInt > 2) {
+                difficultyInt = 2;
+            } else if(difficultyInt < 0) {
+                difficultyInt = 0;
+            }
+
+            return difficulties[difficultyInt];
         } catch(e) {
-            console.error("Could not read from wordset", wordsetName, WORDSETS[wordsetName], e);
+            console.error("Could not read from wordset", wordsetName, wordsets[wordsetName], e);
             return [];
         }
     } else {
@@ -67,7 +110,23 @@ async function loadDefForWord(word) {
     })
 }
 
-async function loadAudioForWord(word) {
+function getUserPath() {
+    return new Promise((resolve, reject) => {
+
+        if(USERDATAPATH != "") {
+            resolve(USERDATAPATH);
+        }
+
+        ipcRenderer.send("get-user-path");
+
+        ipcRenderer.on('user-path-response', (event, path) => {
+            // sound.src = filename;
+            resolve(path);
+        });
+    })
+}
+
+function loadAudioForWord(word) {   
     return new Promise((resolve, reject) => {
         ipcRenderer.send("make-dictionary-request", word);
 
@@ -86,11 +145,13 @@ async function loadAudioForWord(word) {
 // IDEAS:
 // GENERIC LOAD-PAGE FUNCTION (LOADS HTML FILE ACCORDING TO ENUM?)
 
-contextBridge.exposeInMainWorld('electronAPI', {
-    switchPage: switchPage,
-    loadAudioForWord: loadAudioForWord,
-    loadWordset: loadWordset,
-    loadDefForWord: loadDefForWord,
-    availableWordsets: WORDSETS
-})
+getWordsets().then(() => {
+    contextBridge.exposeInMainWorld('electronAPI', {
+        switchPage: switchPage,
+        loadAudioForWord: loadAudioForWord,
+        loadWordset: loadWordset,
+        loadDefForWord: loadDefForWord,
+        wordsets: wordsets
+    })
+});
 

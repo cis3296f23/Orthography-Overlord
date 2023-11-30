@@ -108,9 +108,7 @@ function loadHTML(event, filename) {
 }
 
 
-// declare new event listener
-ipcMain.on("make-dictionary-request", retrieveAudioFileForWord);
-
 ipcMain.on("make-definition-request", retrieveDefinitionFileForWord);
 
 ipcMain.on('load-html', loadHTML);
+ipcMain.on("get-user-path", (event) => { event.reply("user-path-response", app.getPath("userData"))})
