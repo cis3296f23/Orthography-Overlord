@@ -4,8 +4,8 @@ const path = require('node:path')
 const axios = require('axios');
 const fs = require('fs');
 const userpath = app.getPath("userData");
-// const API_ADDRESS = "http://157.245.136.109:3050";
-const API_ADDRESS = "http://localhost:3050";
+const API_ADDRESS = "http://157.245.136.109:3050";
+// const API_ADDRESS = "http://localhost:3050";
 
 // **************
 // ELECTRON SETUP
@@ -109,6 +109,7 @@ function loadHTML(event, filename) {
 
 
 ipcMain.on("make-definition-request", retrieveDefinitionFileForWord);
+ipcMain.on("make-dictionary-request", retrieveAudioFileForWord);
 
 ipcMain.on('load-html', loadHTML);
 ipcMain.on("get-user-path", (event) => { event.reply("user-path-response", app.getPath("userData"))})

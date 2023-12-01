@@ -527,6 +527,7 @@ class GameManager {
         // create a json object
         let defJson = JSON.parse(res);
 
+        console.log(defJson);
         //find the 'short definition'
         let shortDef = defJson[0].shortdef;
         // let stems =
@@ -712,6 +713,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         scoreModal: timerOn? document.getElementById('scoreAndTimerModal'): document.getElementById('scoreModal'),
         scoreGrade: timerOn? document.getElementById('scoreAndTimerGrade'): document.getElementById('scoreGrade'),
         scoreText: timerOn? document.getElementById('scoreAndTimerText'): document.getElementById('scoreText'),
+        
         timerDisplay: timerOn? document.getElementById('timerDisplay'):null,
         finalTime: timerOn? document.getElementById('timerText'):null,
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
@@ -724,12 +726,15 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const replayButton = document.getElementById('replayButton');
     const quitButton = document.getElementById('quitButton');
+    const scoreAndTimerModalButton = document.getElementById('scoreAndTimerModalButton');
     const scoreModalButton = document.getElementById('scoreModalButton');
 
     replayButton.addEventListener('click', () => { gameElements.wordChannel.play();
     replayButton.blur()});
     document.addEventListener("keydown", game.onTypeLetter);
+    scoreAndTimerModalButton.addEventListener('click', switchToMenu);
     scoreModalButton.addEventListener('click', switchToMenu);
+
     quitButton.addEventListener('click', switchToMenu);
 
     game.setupGame(numWords);
