@@ -23,7 +23,7 @@ class WordDifficultyManager {
                 this.wordmap[difficulty] = [word];
             }
         }
-        console.log(this.wordmap);
+        // console.log(this.wordmap);
         for(const key in this.wordmap) {
             if(key < 17){
                 this.easy.push(...this.wordmap[key]);
@@ -35,9 +35,9 @@ class WordDifficultyManager {
                 this.hard.push(...this.wordmap[key]);
             }
         }  
-        console.log(this.easy);
-        console.log(this.medium);
-        console.log(this.hard);
+        // console.log(this.easy);
+        // console.log(this.medium);
+        // console.log(this.hard);
         return [this.easy, this.medium, this.hard];
     }
 

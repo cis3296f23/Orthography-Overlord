@@ -90,7 +90,7 @@ class CircleManager {
 
     flashCurrentCircle() {
         var currentIndexInSubset = this.gameManager.currentWordIndex - this.offset;
-        console.log(currentIndexInSubset);
+        // console.log(currentIndexInSubset);
         this.circleList[currentIndexInSubset].classList.add("animating");
     }
 
@@ -351,7 +351,7 @@ class WordQueueManager {
 
     _getRandomWordQueue(arraySize) {
         const words = window.electronAPI.loadWordset(this.wordsetName, this.wordsetDifficulty);
-        console.log(words);
+        // console.log(words);
         const actualArraySize = Math.min(arraySize, words.length);
         const shuffledWords = this._shuffleArray(words);
 
@@ -496,7 +496,7 @@ class GameManager {
             }
 
             var retryable = this.retryWords.shift() || -1;
-            console.log(retryable);
+            // console.log(retryable);
 
             if(retryable == -1) {
                 this.completeGame();
@@ -519,30 +519,54 @@ class GameManager {
         this.addDefinition(currentWord);
     }
 
+    async loadWord() {
+        var currentWord = this.wordList[this.currentWordIndex];
+        this.audioManager.setAudioForWord(currentWord.word);
+        currentWord.seen = true;
+        this.inputManager.clearInput();
+        this.wordAddedToBack = false;
+        this.addDefinition(currentWord);
+    }
+
     async addDefinition(currentWord){
-        console.log("Stuff");
         //returns the filename of the current word data
         let res = await window.electronAPI.loadDefForWord(currentWord.word);
 
         // create a json object
         let defJson = JSON.parse(res);
 
-        console.log(defJson);
+
         //find the 'short definition'
         let shortDef = defJson[0].shortdef;
-        // let stems =
+        //find the etymology
+
+        //find part of speech
+        let pos = defJson[0].fl;
+
+        let et;
+
+        if (defJson[0] && defJson[0].et && defJson[0].et[0]) {
+            et = defJson[0].et[0][1];
+        } else {
+            et = '';
+        }
+
+        et = et.replace(/{.*?}/g, '');
+
+        // console.log(shortDef);
+
 
         //iterate over the array of values
-        console.log('Before the loop'); // Add this line
         let i = 0;
         this.defText.innerHTML = '';
 
-        // Diplay word for debugging
-        // this.defText.innerHTML += currentWord.word.charAt(0).toUpperCase() + currentWord.word.slice(1);
-        // this.defText.innerHTML += '<br><br>';
+        this.defText.innerHTML += pos;
+        this.defText.innerHTML += '<br><br>';
 
+
+        let count = 0;
         while (shortDef && shortDef[i] !== undefined) {
-            console.log("before");
+            // console.log(shortDef);
             if(shortDef[i].toLowerCase().includes(currentWord.word)){
                 i++;
                 continue;
@@ -551,10 +575,23 @@ class GameManager {
             this.defText.innerHTML += '<br><br>';
             console.log(shortDef[i]);
             i++;
+            count++;
         }
-        if(this.defText.innerHTML == null || this.defText.innerHTML == ''){
+        if(count === 0){
             this.defText.innerHTML += shortDef[0];
+            this.defText.innerHTML += '<br><br>';
+
         }
+        //then add etymology
+
+        if(et != ''){
+            this.defText.innerHTML += et;
+            this.defText.innerHTML += '<br><br>';
+        }else{
+            this.defText.innerHTML += '<br>';
+
+        }
+
 
     }
 
@@ -674,7 +711,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
             const difficulty = document.getElementById("difficulty");
             selectedDifficulty = difficulty.value;
-            console.log(selectedDifficulty)
+            // console.log(selectedDifficulty)
             const timedModeOptions = document.getElementsByName("timedMode")
             for (const timedModeOption of timedModeOptions) {
                 if (timedModeOption.checked) {
@@ -743,14 +780,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     //brings up Modal for definition
     function showDefinition() {
-        console.log('Showing definition modal');
+        // console.log('Showing definition modal');
         document.getElementById('defOverlay').style.display = 'block';
         document.getElementById('defModal').style.display = 'block';
     }
 
     //hides Modal
     function hideDefinition() {
-        console.log('Hiding definition modal');
+        // console.log('Hiding definition modal');
         document.getElementById('defOverlay').style.display = 'none';
         document.getElementById('defModal').style.display = 'none';
     }

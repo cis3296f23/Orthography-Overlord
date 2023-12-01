@@ -24,28 +24,28 @@ function getWordsets() {
         getUserPath().then((userpath) => {
             // get preset paths
             var files = fs.readdirSync(path.join(__dirname, WORDSETPATH));
-            console.log(files);
+            // console.log(files);
             files.forEach(file => {
-                console.log(file);
-                console.log(file.split('.').pop());
+                // console.log(file);
+                // console.log(file.split('.').pop());
                 if(file.split('.').pop() == "csv") {
-                    console.log(file.split('.')[0])
-                    console.log(path.join(WORDSETPATH, file));
+                    // console.log(file.split('.')[0])
+                    // console.log(path.join(WORDSETPATH, file));
                     wordsets[file.split('.')[0]] = path.join(path.join(__dirname, WORDSETPATH), file);
                 }
             });
 
             // loading user files
-            console.log("looking for user's stuff");
-            console.log(path.join(userpath, "/wordsets"));
+            // console.log("looking for user's stuff");
+            // console.log(path.join(userpath, "/wordsets"));
             if(fs.existsSync(path.join(userpath, "/wordsets"))) {
                 var files = fs.readdirSync(path.join(userpath,"/wordsets"));
-                console.log(files);
+                // console.log(files);
                 files.forEach(file => {
-                    console.log(file);
-                    console.log(file.split('.').pop());
+                    // console.log(file);
+                    // console.log(file.split('.').pop());
                     if(file.split('.').pop() == "csv") {
-                        console.log(file.split('.')[0])
+                        // console.log(file.split('.')[0])
                         wordsets[file.split('.')[0]] = path.join(userpath+"/wordsets", file);
                     }
                 });
