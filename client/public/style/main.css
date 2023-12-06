@@ -198,17 +198,17 @@ body {
 }
 
 #defOverlay {
-    display: none; /* Initially hidden */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #defModal {
-    display: none; /* Initially hidden */
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -216,18 +216,30 @@ body {
     background: #0D2331;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #136543;
+    width: 32%;
+}
+.modal-section:first-child {
+    border-bottom: 1px solid #136543;
 }
 
 #defText {
     font-size: 16px;
     color: white;
 }
+
+#posText {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    padding: -2px;
+}
+
 #closeDef{
     position: absolute;
     bottom: 10px;
     left: 10px;
-    background-color: #fff; /* Adjust the background color as needed */
-    color: #057108; /* Adjust the text color as needed */
+    color: #057108;
     padding: 5px 8px;
     font-size: 12px;
     cursor: pointer;
