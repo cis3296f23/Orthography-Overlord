@@ -431,6 +431,8 @@ class GameManager {
         this.wordQueueManager = new WordQueueManager(gameElements.wordsetName, gameElements.wordsetDifficulty);
 
         this.defText = gameElements.defText;
+        this.defTitleText = gameElements.defTitleText;
+        this.posText = gameElements.posText;
 
         this.wordList = [];
 
@@ -559,10 +561,14 @@ class GameManager {
         //iterate over the array of values
         let i = 0;
         this.defText.innerHTML = '';
+        this.defTitleText.innerHTML = '';
+        this.posText.innerHTML = '';
 
-        this.defText.innerHTML += pos;
-        this.defText.innerHTML += '<br><br>';
+        this.posText.innerHTML += '<h3 style=" color: #2591c0;">' + "(" + pos + ")" + '</h3>';
 
+        this.defTitleText.innerHTML += '<h3 style="color: #2591c0;">Definition</h3>';
+
+        this.defText.innerHTML += '<br>';
 
         let count = 0;
         while (shortDef && shortDef[i] !== undefined) {
@@ -582,15 +588,17 @@ class GameManager {
             this.defText.innerHTML += '<br><br>';
 
         }
+        this.defText.innerHTML += '<br>';
+
         //then add etymology
 
-        if(et != ''){
-            this.defText.innerHTML += et;
-            this.defText.innerHTML += '<br><br>';
-        }else{
-            this.defText.innerHTML += '<br>';
-
-        }
+        // if(et != ''){
+        //     this.defText.innerHTML += et;
+        //     this.defText.innerHTML += '<br><br>';
+        // }else{
+        //     this.defText.innerHTML += '<br>';
+        //
+        // }
 
 
     }
@@ -756,6 +764,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordsetName: wordsetSelectionMenu.value,
         defText: document.getElementById('defText'),
+        defTitleText: document.getElementById('defTitleText'),
+        posText: document.getElementById('posText'),
         wordsetDifficulty: selectedDifficulty,
     }
 
