@@ -231,6 +231,14 @@ class AudioManager {
             gameFinishSound.play();
         }, 1000);
     }
+
+    playRankSound(){
+        const rankSound = document.getElementById('rankSound');
+        setTimeout(function() {
+            rankSound.volume = 0.7;
+            rankSound.play();
+        }, 6000);
+    }
 }
 
 class HintManager {
@@ -641,6 +649,7 @@ class GameManager {
         const finalTime = (this.timerManager)? this.timerManager.stopTimer():0;
         this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime);
         this.audioManager.playGameFinishSound();
+        this.audioManager.playRankSound();
     }
 }
 
