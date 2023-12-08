@@ -176,15 +176,6 @@ body {
     display: flex;
     justify-content: left;
 }
-#botDisplayContent {
-    max-width: 600px;
-    position: relative;
-    width: 100%;
-    padding: 130px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
 
 /* Buttons */
 #replayButton {
