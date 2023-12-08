@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('node:path')
 const axios = require('axios');
 const fs = require('fs');
@@ -21,6 +21,12 @@ const createWindow = () => {
       nodeIntegration: true
     }
   })
+
+  const menu = Menu.buildFromTemplate([]);
+
+  Menu.setApplicationMenu(menu);
+
+  mainWindow.setFullScreen(true);
 
   mainWindow.loadFile('menu.html')
 }
