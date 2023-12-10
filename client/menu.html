@@ -12,8 +12,21 @@
     </head>
     <body>
         <h1 style="font-family:'Monotype Corsiva',fantasy">Orthography Overlord</h1>
-        <button style="font-family:'fantasy',monospace" id="contButton" >Continue</button>
-        <button style="font-family:'fantasy',monospace" id="startButton">Start Game</button>
-        <button style="font-family:'fantasy',monospace" id="settingsButton">Settings</button>
+        <button class="menuButton" style="font-family:'fantasy',monospace" id="contButton" >Continue</button>
+        <button class="menuButton" style="font-family:'fantasy',monospace" id="startButton">Start Game</button>
+        <button class="menuButton" style="font-family:'fantasy',monospace" id="tutorialButton">Tutorial</button>
+
+        <div id="slideshow-wrapper">
+            <div id="slideshow-container">
+                <img class="slide visible" src="./public/images/tutorial-slideshow/Slide1.PNG" alt="Slide 1">
+                <img class="slide" src="./public/images/tutorial-slideshow/Slide2.PNG" alt="Slide 2">
+                <img class="slide" src="./public/images/tutorial-slideshow/Slide3.PNG" alt="Slide 3">
+                <img class="slide" src="./public/images/tutorial-slideshow/Slide4.PNG" alt="Slide 4">
+                <img class="slide" src="./public/images/tutorial-slideshow/Slide5.PNG" alt="Slide 5">
+                <button class="tutorialButton" id="prevSlide">&#10094;</a>
+                <button class="tutorialButton" id="nextSlide">&#10095;</a>
+                <button class="tutorialButton" id="closeTutorial">❌</button>
+            </div>
+        </div>
     </body>
 </html>

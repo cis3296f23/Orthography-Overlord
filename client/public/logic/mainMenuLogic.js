@@ -1,10 +1,11 @@
 window.addEventListener('DOMContentLoaded', () => {
     const continueButton = document.getElementById('contButton');
     const startButton = document.getElementById('startButton');
-    const settingsButton = document.getElementById('settingsButton');
-    const buttons = Array.from(document.querySelectorAll('button'));
+    const tutorialButton = document.getElementById('tutorialButton');
+    const buttons = Array.from(document.getElementsByClassName("menuButton"));
     let butNum = 0;
-
+    let allowTutorialKeys = false;
+    let allowMenuKeys = true;
 
     //===============================================Lightning Effect
 
@@ -14,8 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
         continueButton.focus();
     }, 100);
 
-    //Enter will click the button
-    document.addEventListener('keydown', function(event) {
+    function handleMenuKeyPresses(event) {
         if (event.key === 'Enter') {
             buttons[butNum].click();
 
@@ -36,9 +36,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 butNum = butNum % buttons.length;
             }
             buttons[butNum].focus();
-
         }
-    });
+    }
 
     //Remove lightning effect when focus is lost
     buttons.forEach(function(button){
@@ -49,7 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     buttons.forEach(function(button){
         button.addEventListener('focus', function() {
-                button.classList.add('lightning-effect');
+            button.classList.add('lightning-effect');
         });
     });
 
@@ -68,18 +67,88 @@ window.addEventListener('DOMContentLoaded', () => {
     //=====================================Basic click events for each button
 
     startButton.addEventListener('click', () => {
+        if (!allowMenuKeys) return;
         // Send an IPC message to load the menu
         window.electronAPI.switchPage("GAME");
     });
 
     continueButton.addEventListener('click', () => {
+        if (!allowMenuKeys) return;
         // Send an IPC message to load the menu
         window.electronAPI.switchPage("CONTINUE");
     });
 
-    settingsButton.addEventListener('click', () => {
-        // Send an IPC message to load the menu
-        window.electronAPI.switchPage("SETTINGS");
+    const slideshowWrapper = document.getElementById("slideshow-wrapper");
+    tutorialButton.addEventListener('click', () => {
+        if (!allowMenuKeys) return;
+        buttons.forEach(function(button) {
+            button.blur();
+        });
+        slideshowWrapper.style.display = 'block';
+        allowMenuKeys = false;
+        allowTutorialKeys = true;
+    });
+
+    // tutorial buttons
+    const slides = Array.from(document.getElementsByClassName('slide'));
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('visible', i === index);
+        });
+    }
+
+    function nextSlide() {
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+    }
+    function closeTutorial() {
+        slideshowWrapper.style.display = 'none';
+        allowMenuKeys = true;
+        allowTutorialKeys = false;
+    }
+
+
+    function handleTutorialKeyPress(event) {
+        switch (event.key) {
+            case "ArrowRight":
+                nextSlide();
+                break;
+            case "ArrowLeft":
+                prevSlide();
+                break;
+            case "Escape":
+                closeTutorial();
+                break;
+        }
+    }
+    
+
+    document.getElementById('nextSlide').addEventListener('click', nextSlide);
+    document.getElementById('prevSlide').addEventListener('click', prevSlide);
+    document.addEventListener('keydown', (event) => {
+        if (allowMenuKeys) {
+            handleMenuKeyPresses(event)
+        } 
+        if (allowTutorialKeys) {
+            handleTutorialKeyPress(event)
+        }
+    });
+
+    document.getElementById("closeTutorial").addEventListener("click", () => {
+        if (allowTutorialKeys) {
+            closeTutorial()
+        }
     });
 
 });

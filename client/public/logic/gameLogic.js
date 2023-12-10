@@ -345,22 +345,14 @@ class ScoreManager {
         var grade = "F";
         if(this.score == 100) {
             grade = "S";
-        } else if(this.score > 90) {
+        } else if(this.score >= 90) {
             grade = "A";
-        } else if(this.score > 85) {
+        } else if(this.score >= 75) {
             grade = "B";
-        } else if(this.score > 80) {
-            grade = "B";
-        } else if(this.score > 75) {
-            grade = "C";
-        } else if (this.score > 70) {
+        } else if (this.score >= 60) {
             grade = "C"
-        } else if (this.score > 60) {
+        } else if (this.score >= 25) {
             grade = "D"
-        } else if (this.score > 50) {
-            grade = "D"
-        } else if (this.score >25) {
-            grade = "F"
         }
 
         
@@ -839,7 +831,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(numWords);
+    game.setupGame(1);
 
     //==========================================================
 
