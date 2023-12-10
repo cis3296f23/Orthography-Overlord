@@ -35,9 +35,9 @@ class WordDifficultyManager {
                 this.hard.push(...this.wordmap[key]);
             }
         }  
-        // console.log(this.easy);
-        // console.log(this.medium);
-        // console.log(this.hard);
+        console.log(this.easy);
+        console.log(this.medium);
+        console.log(this.hard);
         return [this.easy, this.medium, this.hard];
     }
 
