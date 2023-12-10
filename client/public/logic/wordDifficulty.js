@@ -23,7 +23,7 @@ class WordDifficultyManager {
                 this.wordmap[difficulty] = [word];
             }
         }
-        // console.log(this.wordmap);
+        console.log(this.wordmap);
         for(const key in this.wordmap) {
             if(key < 17){
                 this.easy.push(...this.wordmap[key]);
@@ -38,15 +38,26 @@ class WordDifficultyManager {
         console.log(this.easy);
         console.log(this.medium);
         console.log(this.hard);
-        return [this.easy, this.medium, this.hard];
+        let all_words = this.easy.concat(this.medium, this.hard);
+        console.log(all_words);
+        return [all_words ,this.easy, this.medium, this.hard];
     }
 
     calculateDifficulty(currentWord) {
-        let length_component = (25*this.wordLengthDifficulty(currentWord));
-        let letter_component = (25*this.letterFrequencyCalc(currentWord));
-        let consonant_component = (25*this.consonantSequenceCount(currentWord));
-        let vowel_component = (25*this.vowelSequenceCount(currentWord));
-        return Math.floor(length_component + letter_component + consonant_component + vowel_component);
+        var length_component = 0, letter_component = 0, consonant_component = 0, vowel_component = 0;
+        if(currentWord.length < 7) {
+            letter_component = (33*this.letterFrequencyCalc(currentWord));
+            consonant_component = (33*this.consonantSequenceCount(currentWord));
+            vowel_component = (33*this.vowelSequenceCount(currentWord));
+            return Math.floor(letter_component + consonant_component + vowel_component);
+        }
+        else{
+            length_component = (25*this.wordLengthDifficulty(currentWord));
+            letter_component = (25*this.letterFrequencyCalc(currentWord));
+            consonant_component = (25*this.consonantSequenceCount(currentWord));
+            vowel_component = (25*this.vowelSequenceCount(currentWord));
+            return Math.floor(length_component + letter_component + consonant_component + vowel_component);
+        }
     }
 
     wordLengthDifficulty(currentWord) {
