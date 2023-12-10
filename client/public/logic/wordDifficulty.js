@@ -4,6 +4,7 @@ class WordDifficultyManager {
         this.easy = [];
         this.medium = [];
         this.hard = [];
+        this.all_words = [];
     }
 
     calculateWordListDifficulty(wordList) {
@@ -14,7 +15,7 @@ class WordDifficultyManager {
             if(!regex.test(word)) {
                 continue;
             }
-
+            this.all_words.push(word);
             var difficulty = this.calculateDifficulty(word);
             if(difficulty in this.wordmap) {
                 this.wordmap[difficulty].push(word);
@@ -38,9 +39,8 @@ class WordDifficultyManager {
         console.log(this.easy);
         console.log(this.medium);
         console.log(this.hard);
-        let all_words = this.easy.concat(this.medium, this.hard);
-        console.log(all_words);
-        return [all_words ,this.easy, this.medium, this.hard];
+        console.log(this.all_words);
+        return [this.all_words ,this.easy, this.medium, this.hard];
     }
 
     calculateDifficulty(currentWord) {
