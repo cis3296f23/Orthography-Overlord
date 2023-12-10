@@ -286,7 +286,7 @@ class ScoreManager {
         this.score = 100;
 
         this.difficultyAdjustment = {
-            platinum: [1, 1.2, 1.5],
+            platinum: [1, 1.2, 1.2],
             gold: [1, 1.2, 1.5],
             silver: [1, 1.4, 1.7],
             bronze: [1, 1.6, 1.7]
@@ -294,9 +294,9 @@ class ScoreManager {
 
         this.medalSeconds = {
             platinum: 1800,
-            gold: 2000,
-            silver: 2500,
-            bronze: 3000,
+            gold: 3100,
+            silver: 4200,
+            bronze: 4800,
         }
     }
 
@@ -620,7 +620,7 @@ class GameManager {
 
         this.defTitleText.innerHTML += '<h3 style="color: #2591c0;">Definition</h3>';
 
-        this.defText.innerHTML += '<br>';
+        // this.defText.innerHTML += '<br>';
 
         let count = 0;
         while (shortDef && shortDef[i] !== undefined) {
@@ -630,7 +630,7 @@ class GameManager {
                 continue;
             }
             this.defText.innerHTML += shortDef[i].charAt(0).toUpperCase() + shortDef[i].slice(1);
-            this.defText.innerHTML += '<br><br>';
+            this.defText.innerHTML += '<br>';
             console.log(shortDef[i]);
             i++;
             count++;
@@ -640,7 +640,7 @@ class GameManager {
             this.defText.innerHTML += '<br><br>';
 
         }
-        this.defText.innerHTML += '<br>';
+        // this.defText.innerHTML += '<br>';
 
         //then add etymology
 
@@ -789,6 +789,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('gameSettings').style.display = 'none';
             document.getElementById('circleContainer').classList.remove('hidden');
             document.getElementById('topDisplayWrapper').classList.remove('hidden');
+            document.getElementById('botDisplayWrapper').classList.remove('hidden');
             document.getElementsByClassName('typezone')[0].classList.remove('hidden');
 
             // Remove the keyboard event listener
@@ -857,8 +858,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     //buttons for definition
-    document.getElementById('defButton').addEventListener('click',showDefinition)
-    document.getElementById('closeDef').addEventListener('click',hideDefinition)
+    document.getElementById('defButton').addEventListener('mouseenter',showDefinition)
+    document.getElementById('defButton').addEventListener('mouseleave',hideDefinition)
+    // document.getElementById('closeDef').addEventListener('mouseleave',hideDefinition)
 
 
     // document.getElementById('defText').innerHTML = "Stuff";
