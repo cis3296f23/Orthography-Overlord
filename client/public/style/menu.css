@@ -5,11 +5,10 @@ body {
     height: 100vh;
     margin: 0;
     background: url("../../public/images/reaper.png") center center fixed;
-    /*Ivakhnenko-art*/
     background-size: contain;
     background-repeat: no-repeat;
     background-color: rgb(7, 17, 19);
-    /*overflow: hidden;*/
+    overflow: hidden;
 }
 
 h1 {
@@ -61,4 +60,53 @@ button:hover::before {
     25%, 50%, 75% {
         opacity: 1;
     }
+}
+
+#slideshow-wrapper {
+    display: none;
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+#slideshow-container {
+    margin: 0 auto;
+    top: 15px;
+    max-width: 800px;
+    border: solid white 2px;
+    background-color: white;
+}
+
+.slide {
+    display: none;
+    width: 100%;
+}
+
+.slide.visible {
+    display: block;
+}
+
+.tutorialButton {
+    display: inline-block;
+    text-align: center;
+    font-size: 30px; /* Adjust the font size as needed */
+    cursor: pointer;
+    border: none;
+    border-radius: 5px; /* Optional: Add border-radius for rounded corners */
+    text-align: center;
+    background-color: white;
+}
+
+#closeTutorial {
+    margin-left: 32%
+}
+
+#nextSlide {
+    margin-left: 0%;
+}
+
+#prevSlide {
+    margin-left: 43.5%;
 }
