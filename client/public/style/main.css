@@ -136,23 +136,7 @@ body {
     text-align: center;
     margin-bottom: 20px;
 }
-/* Buttons */
-#replayButton {
-    background-color: #057108;
-    bottom: 20%;
-    left: 40%;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px; 
-    cursor: pointer; 
-    border: none; 
-    border-radius: 5px;
-    outline: none;
-}
-  
-#replayButton:hover {
-    background-color: #003002;
-}
+
 /* Button for returning to main menu */
 #quitButton {
     position: fixed;
@@ -184,31 +168,59 @@ body {
     background-color: rgb(76, 159, 177);
 }
 
-#defButton{
+#botDisplayWrapper {
     position: absolute;
-    bottom: 100px;
-    background-color: #057108;
+    left: 14vw;
+    bottom: 10vw;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+
+/* Buttons */
+#replayButton {
+    position: absolute;
     color: white;
-    padding: 5px 8px;
-    font-size: 12px;
+    padding: 1vw 4vw;
+    font-size: 1em;
     cursor: pointer;
     border: none;
     border-radius: 5px;
     outline: none;
+    background-color: #057108;
+}
+
+#replayButton:hover {
+    background-color: #003002;
+}
+
+#defButton{
+    position: absolute;
+    background-color: #057108;
+    margin-top: 5%;
+    color: white;
+    padding: 1vw 4vw;
+    font-size: 1em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    z-index: 2;
 }
 
 #defOverlay {
-    display: none; /* Initially hidden */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
 }
 
 #defModal {
-    display: none; /* Initially hidden */
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -216,25 +228,39 @@ body {
     background: #0D2331;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #136543;
+    width: 32%;
+    z-index: 2;
+}
+.modal-section:first-child {
+    border-bottom: 1px solid #136543;
 }
 
 #defText {
     font-size: 16px;
     color: white;
 }
-#closeDef{
+
+#posText {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
-    background-color: #fff; /* Adjust the background color as needed */
-    color: #057108; /* Adjust the text color as needed */
-    padding: 5px 8px;
-    font-size: 12px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    outline: none;
+    top: 0;
+    right: 20px;
+    padding: -2px;
 }
+
+/*Not in use Currently*/
+/*#closeDef{*/
+/*    position: absolute;*/
+/*    bottom: 10px;*/
+/*    left: 10px;*/
+/*    color: #057108;*/
+/*    padding: 5px 8px;*/
+/*    font-size: 12px;*/
+/*    cursor: pointer;*/
+/*    border: none;*/
+/*    border-radius: 5px;*/
+/*    outline: none;*/
+/*}*/
 
 .hidden {
     display: none !important;

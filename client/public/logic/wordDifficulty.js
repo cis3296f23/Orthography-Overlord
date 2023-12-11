@@ -4,6 +4,7 @@ class WordDifficultyManager {
         this.easy = [];
         this.medium = [];
         this.hard = [];
+        this.all_words = [];
     }
 
     calculateWordListDifficulty(wordList) {
@@ -14,7 +15,7 @@ class WordDifficultyManager {
             if(!regex.test(word)) {
                 continue;
             }
-
+            this.all_words.push(word);
             var difficulty = this.calculateDifficulty(word);
             if(difficulty in this.wordmap) {
                 this.wordmap[difficulty].push(word);
@@ -23,7 +24,7 @@ class WordDifficultyManager {
                 this.wordmap[difficulty] = [word];
             }
         }
-        // console.log(this.wordmap);
+        //console.log(this.wordmap);
         for(const key in this.wordmap) {
             if(key < 17){
                 this.easy.push(...this.wordmap[key]);
@@ -35,18 +36,28 @@ class WordDifficultyManager {
                 this.hard.push(...this.wordmap[key]);
             }
         }  
-        // console.log(this.easy);
-        // console.log(this.medium);
-        // console.log(this.hard);
-        return [this.easy, this.medium, this.hard];
+        /* console.log(this.easy);
+        console.log(this.medium);
+        console.log(this.hard);
+        console.log(this.all_words); */
+        return [this.all_words ,this.easy, this.medium, this.hard];
     }
 
     calculateDifficulty(currentWord) {
-        let length_component = (25*this.wordLengthDifficulty(currentWord));
-        let letter_component = (25*this.letterFrequencyCalc(currentWord));
-        let consonant_component = (25*this.consonantSequenceCount(currentWord));
-        let vowel_component = (25*this.vowelSequenceCount(currentWord));
-        return Math.floor(length_component + letter_component + consonant_component + vowel_component);
+        var length_component = 0, letter_component = 0, consonant_component = 0, vowel_component = 0;
+        if(currentWord.length < 7) {
+            letter_component = (33*this.letterFrequencyCalc(currentWord));
+            consonant_component = (33*this.consonantSequenceCount(currentWord));
+            vowel_component = (33*this.vowelSequenceCount(currentWord));
+            return Math.floor(letter_component + consonant_component + vowel_component);
+        }
+        else{
+            length_component = (25*this.wordLengthDifficulty(currentWord));
+            letter_component = (25*this.letterFrequencyCalc(currentWord));
+            consonant_component = (25*this.consonantSequenceCount(currentWord));
+            vowel_component = (25*this.vowelSequenceCount(currentWord));
+            return Math.floor(length_component + letter_component + consonant_component + vowel_component);
+        }
     }
 
     wordLengthDifficulty(currentWord) {

@@ -54,9 +54,10 @@
 
       <label for="difficulty">Difficulty:</label>
       <select name="difficulty" id="difficulty">
-        <option value="0">easy</option>
-        <option value="1">medium</option>
-        <option value="2">hard</option>
+        <option value="0">all</option>
+        <option value="1">easy</option>
+        <option value="2">medium</option>
+        <option value="3">hard</option>
       </select>
     
       <button tabindex="-1" id="continueButton">Continue</button>
@@ -66,7 +67,9 @@
 
     <div class="hidden" id="scoreModalWrapper">
       <div id="scoreAndTimerModal">
-        <h1 id="scoreAndTimerGrade"> A+ </h1>
+        <h1 class="scoreGrade" id="scoreAndTimerGrade"> A+ </h1>
+        <img class="scoreGrade" id="scoreAndTimerMedal"/>
+
         
         <div id="scoreModalContent">
           <img id="scoreCrown" src="./public/images/crown.png"> 
@@ -108,8 +111,6 @@
         
         <div id="topDisplayContent"> 
             <button tabindex="-1" id="quitButton">Exit Game</button>
-            <button tabindex="-1" id="replayButton">Replay Word</button>
-            <button id="defButton" >Definition</button>
             <h1 id="hintText"></h1>
         </div>
     </div>
@@ -122,15 +123,34 @@
         <div id="inputContainer" class="letters">
         </div>
     </div>
+    <div class="hidden" id="botDisplayWrapper">
+      <button tabindex="-1" id="replayButton">Replay Word</button>
+      <button id="defButton" >Definition</button>
+    </div>
 
     <!---------------------------- Definition button stuff ------------------------->
+
+
 
     <div id="defOverlay"></div>
 
     <div id="defModal">
-      <p id="defText">This is where the definition should be!</p>
-      <button id="closeDef">Close</button>
+      <div class="modal-section">
+        <p id="defTitleText">This is where we should have Definition and Part of Speech</p>
+        <p id="posText">pos</p>
+      </div>
+      <div class="modal-section">
+        <p id="defText">This is where the definition should be!</p>
+<!--        <button id="closeDef">Close</button>-->
+      </div>
     </div>
+
+
+
+
+
+
+
 
 
 

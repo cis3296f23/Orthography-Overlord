@@ -280,18 +280,56 @@ class HintManager {
 
 }
 
+
+
 class ScoreManager {
 
-    constructor(_scoreModal,_scoreModalWrapper ,_scoreDisplay, _scoreGrade, _finalTime) {
+    constructor(_scoreModal,_scoreModalWrapper ,_scoreDisplay, _scoreGrade, _scoreMedal, _finalTime) {
         this.scoreModal = _scoreModal;
         this.scoreModalWrapper = _scoreModalWrapper;
         this.scoreDisplay = _scoreDisplay;
+        this.scoreMedal = _scoreMedal;
         this.scoreGrade = _scoreGrade;
         this.finalTime = _finalTime;
         this.score = 100;
+
+        this.difficultyAdjustment = {
+            platinum: [1, 1.2, 1.2],
+            gold: [1, 1.2, 1.5],
+            silver: [1, 1.4, 1.7],
+            bronze: [1, 1.6, 1.7]
+        }
+
+        this.medalSeconds = {
+            platinum: 1800,
+            gold: 3100,
+            silver: 4200,
+            bronze: 4800,
+        }
     }
 
-    calculateAndDisplayScore(hintHistory, wordCount, finishTimeString) {
+    calculateMedal(elapsed, wordCount, difficulty) {
+        // 1 second per word
+        var lastMedal = "bronze";
+        for(var medal of Object.keys(this.medalSeconds)) {
+            // console.log(wordCount * this.medalSeconds[medal]);
+            // console.log(elapsed);
+            console.log(this.difficultyAdjustment);
+            console.log(difficulty);
+            var nudge = this.difficultyAdjustment[medal][difficulty];
+
+            console.log(medal, nudge, this.medalSeconds[medal], nudge * this.medalSeconds[medal]);
+            if(wordCount * this.medalSeconds[medal] * nudge > elapsed) {
+                lastMedal = medal;
+                break;
+            }
+        }
+
+        return lastMedal;
+    }
+
+
+    calculateAndDisplayScore(hintHistory, wordCount, finishTimeString, elapsedTime, difficulty) {
         var perWordScore = 100 / wordCount;
 
         for(let hints of Object.values(hintHistory)) {
@@ -312,32 +350,36 @@ class ScoreManager {
             }
         }
 
-        var grade = "F-";
+        var grade = "F";
         if(this.score == 100) {
-            grade = "S+";
-        } else if(this.score > 90) {
+            grade = "S";
+        } else if(this.score >= 90) {
             grade = "A";
-        } else if(this.score > 85) {
-            grade = "B+";
-        } else if(this.score > 80) {
+        } else if(this.score >= 75) {
             grade = "B";
-        } else if(this.score > 75) {
-            grade = "C+";
-        } else if (this.score > 70) {
+        } else if (this.score >= 60) {
             grade = "C"
-        } else if (this.score > 60) {
-            grade = "D+"
-        } else if (this.score > 50) {
+        } else if (this.score >= 25) {
             grade = "D"
-        } else if (this.score >25) {
-            grade = "F"
         }
 
+        
         this.scoreModalWrapper.classList.toggle("hidden");
         this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
         this.scoreGrade.innerHTML = `${grade}`
+
         if (this.finalTime) {
             this.finalTime.innerHTML = finishTimeString;
+            console.log(elapsedTime);
+            var medal = this.calculateMedal(elapsedTime, wordCount, difficulty);
+            this.scoreMedal.src = `./public/images/${medal}.png`;
+
+            if(medal == "platinum") {
+                this.scoreMedal.classList.add("platinum");
+            } else {
+                this.scoreMedal.classList.remove("platinum");
+            }
+
         }
         this.scoreModal.classList.add("show");
     }
@@ -381,6 +423,7 @@ class timerManager {
         this.isRunning = false;
         this.interval_id = null;
         this.timerDisplay = timerDisplay;
+        this.elapsed = 0;
     }
 
     startTimer() {
@@ -408,7 +451,7 @@ class timerManager {
         const minutes = Math.floor(elapsedTime / (60 * 1000));
         const seconds = Math.floor((elapsedTime % (60 * 1000)) / 1000);
         const centiseconds = Math.floor((elapsedTime % 1000) / 10);
-
+        this.elapsed = elapsedTime;
         const displayString = `${this._formatTimeComponent(minutes)}:${this._formatTimeComponent(seconds)}.${this._formatTimeComponent(centiseconds)}`;
         this.timerDisplay.textContent = displayString;
     }
@@ -434,12 +477,15 @@ class GameManager {
         this.inputManager = new InputManager(gameElements.inputContainer);
         this.audioManager = new AudioManager(gameElements.wordChannel, gameElements.answerChannel);
         this.hintManager = new HintManager(gameElements.hintText);
-        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreModalWrapper, gameElements.scoreText, gameElements.scoreGrade, gameElements.finalTime);
+        this.scoreManager = new ScoreManager(gameElements.scoreModal, gameElements.scoreModalWrapper, gameElements.scoreText, gameElements.scoreGrade, gameElements.scoreMedal, gameElements.finalTime);
         this.circleManager = new CircleManager(gameElements.circleContainer, this);
         this.wordQueueManager = new WordQueueManager(gameElements.wordsetName, gameElements.wordsetDifficulty);
 
         this.defText = gameElements.defText;
+        this.defTitleText = gameElements.defTitleText;
+        this.posText = gameElements.posText;
 
+        this.selectedDifficulty = gameElements.wordsetDifficulty;
         this.wordList = [];
 
         this.wordAddedToBack = false;
@@ -567,10 +613,14 @@ class GameManager {
         //iterate over the array of values
         let i = 0;
         this.defText.innerHTML = '';
+        this.defTitleText.innerHTML = '';
+        this.posText.innerHTML = '';
 
-        this.defText.innerHTML += pos;
-        this.defText.innerHTML += '<br><br>';
+        this.posText.innerHTML += '<h3 style=" color: #2591c0;">' + "(" + pos + ")" + '</h3>';
 
+        this.defTitleText.innerHTML += '<h3 style="color: #2591c0;">Definition</h3>';
+
+        // this.defText.innerHTML += '<br>';
 
         let count = 0;
         while (shortDef && shortDef[i] !== undefined) {
@@ -580,7 +630,7 @@ class GameManager {
                 continue;
             }
             this.defText.innerHTML += shortDef[i].charAt(0).toUpperCase() + shortDef[i].slice(1);
-            this.defText.innerHTML += '<br><br>';
+            this.defText.innerHTML += '<br>';
             console.log(shortDef[i]);
             i++;
             count++;
@@ -590,15 +640,17 @@ class GameManager {
             this.defText.innerHTML += '<br><br>';
 
         }
+        // this.defText.innerHTML += '<br>';
+
         //then add etymology
 
-        if(et != ''){
-            this.defText.innerHTML += et;
-            this.defText.innerHTML += '<br><br>';
-        }else{
-            this.defText.innerHTML += '<br>';
-
-        }
+        // if(et != ''){
+        //     this.defText.innerHTML += et;
+        //     this.defText.innerHTML += '<br><br>';
+        // }else{
+        //     this.defText.innerHTML += '<br>';
+        //
+        // }
 
 
     }
@@ -647,7 +699,8 @@ class GameManager {
 
     completeGame() {
         const finalTime = (this.timerManager)? this.timerManager.stopTimer():0;
-        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime);
+        const elapsed = (this.timerManager)? this.timerManager.elapsed:0;
+        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime, elapsed, this.selectedDifficulty);
         this.audioManager.playGameFinishSound();
         this.audioManager.playRankSound();
     }
@@ -737,6 +790,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('gameSettings').style.display = 'none';
             document.getElementById('circleContainer').classList.remove('hidden');
             document.getElementById('topDisplayWrapper').classList.remove('hidden');
+            document.getElementById('botDisplayWrapper').classList.remove('hidden');
             document.getElementsByClassName('typezone')[0].classList.remove('hidden');
 
             // Remove the keyboard event listener
@@ -759,12 +813,15 @@ window.addEventListener('DOMContentLoaded', async () => {
         scoreModal: timerOn? document.getElementById('scoreAndTimerModal'): document.getElementById('scoreModal'),
         scoreGrade: timerOn? document.getElementById('scoreAndTimerGrade'): document.getElementById('scoreGrade'),
         scoreText: timerOn? document.getElementById('scoreAndTimerText'): document.getElementById('scoreText'),
-        
+        scoreMedal: timerOn? document.getElementById('scoreAndTimerMedal'): document.getElementById('scoreMedal'),
+
         timerDisplay: timerOn? document.getElementById('timerDisplay'):null,
         finalTime: timerOn? document.getElementById('timerText'):null,
         // should change wordSetPath the directory of the word sets and add functionality to select a word set
         wordsetName: wordsetSelectionMenu.value,
         defText: document.getElementById('defText'),
+        defTitleText: document.getElementById('defTitleText'),
+        posText: document.getElementById('posText'),
         wordsetDifficulty: selectedDifficulty,
     }
 
@@ -783,7 +840,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(numWords);
+    game.setupGame(1);
 
     //==========================================================
 
@@ -802,8 +859,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     //buttons for definition
-    document.getElementById('defButton').addEventListener('click',showDefinition)
-    document.getElementById('closeDef').addEventListener('click',hideDefinition)
+    document.getElementById('defButton').addEventListener('mouseenter',showDefinition)
+    document.getElementById('defButton').addEventListener('mouseleave',hideDefinition)
+    // document.getElementById('closeDef').addEventListener('mouseleave',hideDefinition)
 
 
     // document.getElementById('defText').innerHTML = "Stuff";
