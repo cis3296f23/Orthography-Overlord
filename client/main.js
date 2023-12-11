@@ -72,13 +72,23 @@ async function retrieveAudioFileForWord(event, word) {
     return;
   }
 
+
+
   try {
     const audioStream = await axios.get(url, { responseType: 'stream' });
-    await download(audioStream, filename);
+    download(audioStream, filename)
+    .then((_) => {
+    
     // await audioStream.data.pipe(fs.createWriteStream(filename));
-    event.reply("dictionary-data-response", filename);
+      event.reply("dictionary-data-response", filename);
+    })
+    .catch((err) => {
+      console.err("dL ERR");
+    })
+    
   } catch(err) {
     console.error(err);
+    console.log("AUD ERR", err)
     event.reply("dictionary-error-response", JSON.stringify(err));
   }
 }
@@ -100,6 +110,7 @@ async function retrieveDefinitionFileForWord(event, word) {
     event.reply("definition-data-response", JSON.stringify(def.data));
   } catch(err) {
     console.error(err);
+    console.log("DEF ERR", err);
     event.reply("defintion-error-response", JSON.stringify(err));
   }
 }
