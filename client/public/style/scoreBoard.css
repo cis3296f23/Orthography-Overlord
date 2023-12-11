@@ -22,12 +22,21 @@
     position: absolute;
     right: -30px;
     top: -80px;
-    box-shadow: 5px 5px black;
+    /* box-shadow: 5px 5px black; */
     text-shadow: 4px 4px 10px black;
     font-size: 50pt;
     transform: rotateZ(10deg);
-    border: 5px #e69d02 solid;
-    animation: appear 6.5s steps(1);
+    /* border: 5px #e69d02 solid; */
+    animation-name: appear;
+    animation-duration: 2.5s;
+    animation-timing-function: steps(1);
+    animation-fill-mode: forwards;
+    /* animation-duration: 1s; */
+}
+
+.scoreGrade.platinum {
+    animation-duration: 6.5s;
+
 }
 
 .firework {
@@ -38,6 +47,7 @@
     transform: translate(-50%, -50%);
     width: 0.5vmin;
     aspect-ratio: 1;
+    z-index: 4;
     background:
       /* random backgrounds */
       radial-gradient(circle, #ff0 0.2vmin, #0000 0) 50% 00%,
@@ -67,9 +77,13 @@
       ;
     background-size: 0.5vmin 0.5vmin;
     background-repeat: no-repeat;
-    animation: firework 2s 6.5s;
+    animation: firework 2s 2.5s;
     opacity: 0;
-  }
+}
+
+.firework.platinum {
+    animation: firework 2s 6.5s;
+}
 
 @keyframes firework {
     0% { 

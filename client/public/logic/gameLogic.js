@@ -224,20 +224,31 @@ class AudioManager {
         this.answerSound.play();
     }
 
-    playGameFinishSound() {
+    playGameFinishSound(medal) {
         const gameFinishSound = document.getElementById('winGameSound');
+        if(medal == "platinum") {
+            gameFinishSound.src = "./public/sounds/level_clear.mp3"
+        } else {
+            gameFinishSound.src = "./public/sounds/win_game.mp3";
+        }
         setTimeout(function() {
             gameFinishSound.volume = 0.7;
             gameFinishSound.play();
         }, 1000);
     }
 
-    playRankSound(){
+    playRankSound(medal){
+        var timeout = 2500;
+
+        if(medal == "platinum") {
+            timeout = 6500;
+        }
+
         const rankSound = document.getElementById('rankSound');
         setTimeout(function() {
             rankSound.volume = 0.7;
             rankSound.play();
-        }, 6000);
+        }, timeout);
     }
 }
 
@@ -294,10 +305,10 @@ class ScoreManager {
         this.score = 100;
 
         this.difficultyAdjustment = {
-            platinum: [1, 1.2, 1.2],
-            gold: [1, 1.2, 1.5],
-            silver: [1, 1.4, 1.7],
-            bronze: [1, 1.6, 1.7]
+            platinum: [1.2, 1, 1.2, 1.2],
+            gold: [1.2, 1, 1.2, 1.5],
+            silver: [1.4, 1, 1.4, 1.7],
+            bronze: [1.6, 1, 1.6, 1.7]
         }
 
         this.medalSeconds = {
@@ -367,23 +378,37 @@ class ScoreManager {
         this.scoreModalWrapper.classList.toggle("hidden");
         this.scoreDisplay.innerHTML = `${Math.round(this.score)} %`;
         this.scoreGrade.innerHTML = `${grade}`
+        var medal;
 
         if (this.finalTime) {
             this.finalTime.innerHTML = finishTimeString;
             console.log(elapsedTime);
-            var medal = this.calculateMedal(elapsedTime, wordCount, difficulty);
+            medal = this.calculateMedal(elapsedTime, wordCount, difficulty);
             this.scoreMedal.src = `./public/images/${medal}.png`;
+            var fireworks = document.getElementsByClassName("firework");
 
             if(medal == "platinum") {
+                for(var firework of fireworks) {
+                    firework.classList.add("platinum");
+                }
                 this.scoreMedal.classList.add("platinum");
+                this.scoreGrade.classList.add("platinum");
+
             } else {
+                for(var firework of fireworks) {
+                    firework.classList.remove("platinum");
+                }
                 this.scoreMedal.classList.remove("platinum");
+                this.scoreGrade.classList.remove("platinum");
+
             }
 
         }
-        this.scoreModal.classList.add("show");
-    }
 
+        this.scoreModal.classList.add("show");
+
+        return medal;
+    }
 }
 
 class WordQueueManager {
@@ -700,9 +725,9 @@ class GameManager {
     completeGame() {
         const finalTime = (this.timerManager)? this.timerManager.stopTimer():0;
         const elapsed = (this.timerManager)? this.timerManager.elapsed:0;
-        this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime, elapsed, this.selectedDifficulty);
-        this.audioManager.playGameFinishSound();
-        this.audioManager.playRankSound();
+        var medal = this.scoreManager.calculateAndDisplayScore(this.hintManager.hintHistory, this.wordList.length, finalTime, elapsed, this.selectedDifficulty);
+        this.audioManager.playGameFinishSound(medal);
+        this.audioManager.playRankSound(medal);
     }
 }
 
