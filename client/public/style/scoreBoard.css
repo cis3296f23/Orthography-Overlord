@@ -22,9 +22,78 @@
     position: absolute;
     right: -30px;
     top: -80px;
+    /* box-shadow: 5px 5px black; */
     text-shadow: 4px 4px 10px black;
     font-size: 50pt;
     transform: rotateZ(10deg);
+    /* border: 5px #e69d02 solid; */
+    animation-name: appear;
+    animation-duration: 2.5s;
+    animation-timing-function: steps(1);
+    animation-fill-mode: forwards;
+    /* animation-duration: 1s; */
+}
+
+.scoreGrade.platinum {
+    animation-duration: 6.5s;
+
+}
+
+.firework {
+    position: absolute;
+    left: 390px;
+    top: 0px;
+    content: "";
+    transform: translate(-50%, -50%);
+    width: 0.5vmin;
+    aspect-ratio: 1;
+    z-index: 4;
+    background:
+      /* random backgrounds */
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 50% 00%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 00% 50%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 50% 99%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 99% 50%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 80% 90%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 95% 90%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 10% 60%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 31% 80%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 80% 10%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 90% 23%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 45% 20%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 22% 44%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 19% 67%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 43% 00%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 38% 74%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 16% 59%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 22% 60%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 80% 95%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 60% 10%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 80% 31%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 10% 80%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 23% 90%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 20% 45%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 13% 24%
+      ;
+    background-size: 0.5vmin 0.5vmin;
+    background-repeat: no-repeat;
+    animation: firework 2s 2.5s;
+    opacity: 0;
+}
+
+.firework.platinum {
+    animation: firework 2s 6.5s;
+}
+
+@keyframes firework {
+    0% { 
+        width: 0.5vmin;
+        opacity: 1;
+      }
+    100% { 
+        width: 45vmin; 
+        opacity: 0; 
+      }
 }
 
 img.scoreGrade {

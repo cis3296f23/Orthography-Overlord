@@ -11,7 +11,10 @@
   <body>
     <audio id="primaryAudio" src="./public/sounds/comedy_sound.wav"></audio>
     <audio id="answerSound"></audio>
+    <!-- <audio id="winGameSound" src="./public/sounds/level_clear.mp3"></audio> -->
     <audio id="winGameSound" src="./public/sounds/win_game.mp3"></audio>
+
+    <audio id="rankSound" src="./public/sounds/rank.mp3"></audio>
 
     <div id="gameSettings">
       <h2 id="gameSettingsTitle">Game Options</h2>
@@ -68,8 +71,8 @@
       <div id="scoreAndTimerModal">
         <h1 class="scoreGrade" id="scoreAndTimerGrade"> A+ </h1>
         <img class="scoreGrade" id="scoreAndTimerMedal"/>
+        <div class="firework"></div>
 
-        
         <div id="scoreModalContent">
           <img id="scoreCrown" src="./public/images/crown.png"> 
           <h2> Great Job! </h2>
@@ -86,8 +89,9 @@
       </div>
 
       <div class="hidden" id="scoreModal">
-        <h1 class="scoreGrade" id="scoreGrade"> A+ </h1>
-
+        <h1 class="scoreGrade"> A+ </h1>
+        <div class="firework"></div>
+        
         <div id="scoreModalContent">
           <img id="scoreCrown" src="./public/images/crown.png"> 
           <h2> Great Job! </h2>
