@@ -120,7 +120,7 @@ class FeatureServer {
 					res.sendFile(filename);
 				})
 				.catch((err) => {
-					res.status(200).send(err);
+					res.status(404).send(err);
 				})
 		})
 		app.get('/def/:word', (req, res) => {

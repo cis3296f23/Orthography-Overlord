@@ -75,7 +75,15 @@ async function retrieveAudioFileForWord(event, word) {
 
 
   try {
+    const response = await axios.get(url);
+    console.log(response);
+    if(response.status == 404) {
+      event.reply("dictionary-error-response", "404, word not found");
+      return;
+    }
+
     const audioStream = await axios.get(url, { responseType: 'stream' });
+    
     download(audioStream, filename)
     .then((_) => {
     
@@ -85,7 +93,7 @@ async function retrieveAudioFileForWord(event, word) {
     .catch((err) => {
       console.err("dL ERR");
     })
-    
+
   } catch(err) {
     console.error(err);
     console.log("AUD ERR", err)
