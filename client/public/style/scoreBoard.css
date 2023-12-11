@@ -32,8 +32,8 @@
 
 .firework {
     position: absolute;
-    right: -30px;
-    top: -80px;
+    left: 390px;
+    top: 0px;
     content: "";
     transform: translate(-50%, -50%);
     width: 0.5vmin;
@@ -51,11 +51,24 @@
       radial-gradient(circle, #ff0 0.3vmin, #0000 0) 80% 10%,
       radial-gradient(circle, #ff0 0.2vmin, #0000 0) 90% 23%,
       radial-gradient(circle, #ff0 0.3vmin, #0000 0) 45% 20%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 22% 44%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 19% 67%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 43% 00%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 38% 74%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 16% 59%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 22% 60%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 80% 95%,
+      radial-gradient(circle, #ff0 0.5vmin, #0000 0) 60% 10%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 80% 31%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 10% 80%,
+      radial-gradient(circle, #ff0 0.2vmin, #0000 0) 23% 90%,
+      radial-gradient(circle, #ff0 0.3vmin, #0000 0) 20% 45%,
       radial-gradient(circle, #ff0 0.5vmin, #0000 0) 13% 24%
       ;
     background-size: 0.5vmin 0.5vmin;
     background-repeat: no-repeat;
-    animation: firework 2s infinite;
+    animation: firework 2s 6.5s;
+    opacity: 0;
   }
 
 @keyframes firework {
@@ -63,7 +76,7 @@
         width: 0.5vmin;
         opacity: 1;
       }
-      100% { 
+    100% { 
         width: 45vmin; 
         opacity: 0; 
       }
