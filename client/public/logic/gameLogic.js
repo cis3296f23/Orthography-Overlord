@@ -840,7 +840,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     quitButton.addEventListener('click', switchToMenu);
 
-    game.setupGame(1);
+    game.setupGame(numWords);
 
     //==========================================================
 
