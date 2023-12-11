@@ -66,38 +66,39 @@ async function retrieveAudioFileForWord(event, word) {
   // const url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=fa42b88d-7476-4683-8554-836973c63ab2`;
   const filename = path.join(userpath, `${word}.mp3`);
 
-  if(fs.existsSync(filename)) {
-    console.log("Audio file has already been downloaded.");
-    event.reply("dictionary-data-response", filename);
-    return;
-  }
-
-
-
   try {
-    const response = await axios.get(url);
-    console.log(response);
-    if(response.status == 404) {
-      event.reply("dictionary-error-response", "404, word not found");
+    await axios.get(url);
+
+    if(fs.existsSync(filename)) {
+      console.log("Audio file has already been downloaded.");
+      event.reply("dictionary-data-response", filename);
       return;
     }
 
-    const audioStream = await axios.get(url, { responseType: 'stream' });
-    
-    download(audioStream, filename)
-    .then((_) => {
-    
-    // await audioStream.data.pipe(fs.createWriteStream(filename));
-      event.reply("dictionary-data-response", filename);
-    })
-    .catch((err) => {
-      console.err("dL ERR");
-    })
 
-  } catch(err) {
-    console.error(err);
-    console.log("AUD ERR", err)
-    event.reply("dictionary-error-response", JSON.stringify(err));
+
+    try {
+
+      const audioStream = await axios.get(url, { responseType: 'stream' });
+      
+      download(audioStream, filename)
+      .then((_) => {
+      
+      // await audioStream.data.pipe(fs.createWriteStream(filename));
+        event.reply("dictionary-data-response", filename);
+      })
+      .catch((err) => {
+        console.err("dL ERR");
+      })
+
+    } catch(err) {
+      console.error(err);
+      console.log("AUD ERR", err)
+      event.reply("dictionary-error-response", JSON.stringify(err));
+    }
+
+  } catch(e) {
+    event.reply("dictionary-error-response", "404, word not found");
   }
 }
 
