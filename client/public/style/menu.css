@@ -9,6 +9,7 @@ body {
     background-repeat: no-repeat;
     background-color: rgb(7, 17, 19);
     overflow: hidden;
+    z-index: 0;
 }
 
 h1 {
@@ -27,6 +28,7 @@ button {
     border: none;
     position: relative;
     outline:none;
+    z-index: 0;
 }
 
 button:hover::before {
@@ -51,6 +53,34 @@ button:hover::before {
     bottom: 0;
     opacity: 0;
     animation: lightning 0.9s ease-in-out infinite;
+}
+.Lightning-2 {
+    position: absolute;
+    width: auto;
+    height: 950px;
+    transform: rotate(-45deg);
+    bottom: 400px;
+    right: 700px;
+    animation: lightningBolt 5s infinite;
+    animation-delay: -2s;
+    z-index: -1;
+}
+.Lightning-1 {
+    position: absolute;
+    width: auto;
+    height: 950px;
+    transform: rotate(45deg);
+    bottom: 100px;
+    left: 600px;
+    animation: lightningBolt 4s infinite;
+    z-index: -1;
+}
+
+@keyframes lightningBolt {
+    34%, 100% {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 @keyframes lightning {
@@ -100,7 +130,7 @@ button:hover::before {
 }
 
 #closeTutorial {
-    margin-left: 32%
+    margin-left: 17%
 }
 
 #nextSlide {
